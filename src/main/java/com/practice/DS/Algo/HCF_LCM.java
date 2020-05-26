@@ -37,5 +37,6 @@ public class HCF_LCM {
     public static void deleteMe(){
         System.out.println("hey abbay");
         System.out.println("life is hell ohh man");
+        System.out.println("why to bother living");
     }
 }
