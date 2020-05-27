@@ -35,8 +35,6 @@ public class HCF_LCM {
         return (firstNo*secondNo)/findHCF(firstNo,secondNo);
     }
     public static void deleteMe(){
-        System.out.println("hey abbay");
-        System.out.println("life is hell ohh man");
-        System.out.println("why to bother living");
+        System.out.println("you should be able to see this one");
     }
 }
