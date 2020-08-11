@@ -4,6 +4,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableValidator;
 import javax.validation.groups.Default;
+import java.math.BigInteger;
 import java.util.Set;
 class HCF{
     public void check(@NotNull(message = "first name cannot be null") String ab, @NotNull  String cv){
@@ -38,5 +39,11 @@ public class HCF_LCM {
         System.out.println("hey abbay");
         System.out.println("life is hell ohh man");
         System.out.println("why to bother living");
+    }
+
+    public static BigInteger countzeros(BigInteger no){
+        BigInteger ab=new BigInteger(String.valueOf(1));
+
+        return null;
     }
 }
