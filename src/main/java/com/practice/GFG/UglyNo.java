@@ -1,6 +1,7 @@
 package com.practice.GFG;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 class Main {
@@ -18,14 +19,100 @@ class Main {
 
     public static void main(String[] args) {
         ArrayList<Integer> useme = new ArrayList<>();
-        useme.addAll(Arrays.asList(2,3,1,1,4));
+        useme.addAll(Arrays.asList(47, 14, 30, 19, 30, 4, 32, 32, 15, 2, 6, 24));
         ArrayList<Integer> useme1 = new ArrayList<>();
         useme1.addAll(Arrays.asList(4, 3, 1, 2));
         String av = "12";
 
         Main m = new Main();
-        System.out.println(m.jump(useme));
+
     }
+    public int maxProduct(final List<Integer> A) {
+        int minmax=A.get(0);
+        int positivemax=A.get(0);
+        int max=A.get(0);
+        int temp1=1;
+        int temp2=1;
+        for(int y=1;y<A.size();y++){
+            temp1=minmax*A.get(y);
+            temp2=positivemax*A.get(y);
+            minmax=Math.min(A.get(y),Math.min(temp1,temp2));
+            positivemax=Math.max(A.get(y),Math.max(temp2,temp1));
+            max=Math.max(max,positivemax);
+        }
+        return max;
+    }
+
+}
+/*
+    public ArrayList<ArrayList<Integer>> avgset(ArrayList<Integer> A) {
+        ArrayList<ArrayList<Integer>> returnme=new ArrayList<>();
+        int totalSum=0;
+        for(int y:A){
+            totalSum+=y;
+        }
+        double average=(double)totalSum/A.size();
+        int value=-1,sum=0;
+        ArrayList<Integer> firstSet=new ArrayList<>();
+        Collections.sort(A);
+        boolean result[][]=solve(A,totalSum);
+        for(int y=1;y<A.size()-1;y++){
+            if((average*y)==(int)(average*y)){
+                sum=(int)(average*y);
+                while(sum>0) {
+                    value = findValue(result, sum, A);
+                    if (value == -1) break;
+                    firstSet.add(value);
+                    sum=sum-value;
+                }
+                if(firstSet.size()!=y){firstSet.clear();}
+                else break;
+            }
+        }
+        ArrayList<Integer> secondSet=new ArrayList<>();
+        for(int y:A){
+            if(!firstSet.contains(y))secondSet.add(y);
+        }
+        Collections.sort(firstSet);
+        Collections.sort(secondSet);
+        if(firstSet.size()==0 || secondSet.size()==0)return returnme;
+        if(firstSet.size()>secondSet.size()){
+            returnme.add(secondSet);
+            returnme.add(firstSet);
+        }
+        else
+        {
+            returnme.add(secondSet);
+            returnme.add(firstSet);
+        }
+        return returnme;
+    }
+    public int findValue(boolean [][]array,int sum,ArrayList<Integer> A){
+        int result=-1;
+        if(array[0].length<sum)return -1;
+        for(int row=1;row<A.size();row++){
+            if(array[row][sum]==true){
+                return A.get(row-1);
+            }
+        }
+        return -1;
+    }
+    public boolean[][] solve(ArrayList<Integer> A, int B) {
+        boolean result[][]=new boolean[A.size()+1][B+1];
+        for(int r=0;r<A.size()+1;r++){
+            for(int c=0;c<B+1;c++){
+                if(c==0){result[r][c]=true;continue;}
+                if(r==0)continue;
+                if((A.get(r-1)==c) || result[r-1][c]==true){result[r][c]=true;continue;}
+                if(c>A.get(r-1) && result[r-1][c-A.get(r-1)]){
+                    result[r][c]=true;
+                }
+            }
+        }
+        return result;
+    }
+
+}/*
     Map<String,Integer> mincut=new HashMap<>();
     public int minCut(String A) {
     }
