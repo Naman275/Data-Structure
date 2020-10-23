@@ -1,7 +1,4 @@
 package com.practice.GFG;
-import org.jetbrains.annotations.NotNull;
-
-import java.lang.reflect.Array;
 import java.util.*;
 
 class Main {
@@ -19,13 +16,79 @@ class Main {
 
     public static void main(String[] args) {
         ArrayList<Integer> useme = new ArrayList<>();
-        useme.addAll(Arrays.asList(47, 14, 30, 19, 30, 4, 32, 32, 15, 2, 6, 24));
+        useme.addAll(Arrays.asList(-1, -2, 3, 4, 0, 9, 1));
         ArrayList<Integer> useme1 = new ArrayList<>();
         useme1.addAll(Arrays.asList(4, 3, 1, 2));
         String av = "12";
 
         Main m = new Main();
 
+    }
+
+    public int solve(ArrayList<Integer> A, ArrayList<Integer> B, int C) {
+        return 1;
+    }
+
+}
+/*
+    public int solve(ArrayList<Integer> A, ArrayList<Integer> B, int C) {
+        return solve(A,B,C,0);
+    }
+    Map<Integer,Map<Integer,Integer>> mapit=new HashMap<>();
+    public int solve(ArrayList<Integer> A, ArrayList<Integer> B, int C,int i) {
+        if(i>=A.size() || C<=0)return 0;
+        if(mapit.containsKey(i) && mapit.get(i).containsKey(C))return mapit.get(i).get(C);
+        int a=0,b=0;
+        if(B.get(i)>C){
+            a=solve(A,B,C-B.get(i),i+1);
+            a+=A.get(i);
+        }
+        b=solve(A,B,C,i+1);
+        Map<Integer,Integer> mapme=new HashMap<>();
+        mapme.put(C,b);
+        mapit.put(i,mapme);
+        return Math.max(a,b);
+    }
+
+    int countW (String A) {
+        int cnt = 0;
+        for (int i=0; i<A.length(); i++) {
+            cnt += A.charAt(i) == 'W'?1:0;
+        }
+        return cnt;
+    }
+    Map<String, Map<Integer, Integer>> memo = new HashMap<>();
+    public int arrange(String A, int B) {
+        if (B > A.length() || B == 0) return -1;
+        if (B==1) {
+            int whites = countW(A);
+            return whites * (A.length() - whites);
+        }
+        if (memo.containsKey(A) && memo.get(A).containsKey(B)) return memo.get(A).get(B);
+        int min = Integer.MAX_VALUE;
+        for (int i=1; i <= 1 + A.length() - B; i++) {
+            String prefix = A.substring(0,i);
+            int whitesPrefix = countW(prefix);
+            String suffix = A.substring(i, A.length());
+            min = Math.min (min, (whitesPrefix * (i - whitesPrefix)) + arrange(suffix, B-1));
+        }
+        memo.putIfAbsent(A, new HashMap<>());
+        memo.get(A).put(B, min);
+        return min;
+    }
+
+}/*
+    public int findme(List<Integer> A){
+        int max=A.get(0);
+        int mintillnow=A.get(0);
+        int maxtillnow=A.get(0);
+        for(int y=1;y<A.size();y++){
+            int a=A.get(y)*mintillnow;
+            int b=A.get(y)*maxtillnow;
+            mintillnow=Math.min(A.get(y),Math.min(a,b));
+            maxtillnow=Math.max(A.get(y),Math.max(maxtillnow,maxtillnow*A.get(y)));
+
+        }return 0;
     }
     public int maxProduct(final List<Integer> A) {
         int minmax=A.get(0);
@@ -38,6 +101,7 @@ class Main {
             temp2=positivemax*A.get(y);
             minmax=Math.min(A.get(y),Math.min(temp1,temp2));
             positivemax=Math.max(A.get(y),Math.max(temp2,temp1));
+            System.out.println("y="+y+"  min="+minmax+"   max="+positivemax);
             max=Math.max(max,positivemax);
         }
         return max;
