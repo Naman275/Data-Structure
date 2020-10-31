@@ -1,4 +1,6 @@
 package com.practice.GFG;
+
+
 import java.util.*;
 
 class Main {
@@ -16,17 +18,227 @@ class Main {
 
     public static void main(String[] args) {
         ArrayList<Integer> useme = new ArrayList<>();
-        useme.addAll(Arrays.asList(-1, -2, 3, 4, 0, 9, 1));
+        useme.addAll(Arrays.asList(60, 100, 120));
         ArrayList<Integer> useme1 = new ArrayList<>();
-        useme1.addAll(Arrays.asList(4, 3, 1, 2));
+        useme1.addAll(Arrays.asList(10, 20, 30));
         String av = "12";
-
+        int array[][] = {
+        {
+            98, 894
+        },
+        {
+            397, 942
+        },
+        {
+            70, 519
+        },
+        {
+            258, 456
+        },
+        {
+            286, 449
+        },
+        {
+            516, 626
+        },
+        {
+            370, 873
+        },
+        {
+            214, 224
+        },
+        {
+            74, 629
+        },
+        {
+            265, 886
+        },
+        {
+            708, 815
+        },
+        {
+            394, 770
+        },
+        {
+            56, 252
+        }
+    };
         Main m = new Main();
-
+        m.solve(array);
+    }
+    private int solve(int[][] A) {
+        PriorityQueue<List<Integer>> pq=new PriorityQueue<>(new Comparator<List<Integer>>() {
+            @Override
+            public int compare(List<Integer> integers, List<Integer> t1) {
+                return integers.get(0)-t1.get(0);
+            }
+        });
+        for(int y=0;y<A.length;y++){
+            List<Integer> p=new ArrayList<>();
+            p.add(A[y][1]);p.add(A[y][0]);
+            pq.add(p);
+        }
+        int count=0;
+        int previous=Integer.MIN_VALUE;
+        while (!pq.isEmpty()){
+            List p=pq.poll();
+            if(previous<(int)p.get(1)){
+                count++;
+                previous=(int)p.get(0);
+            }
+        }
+        return count;
+    }
+    public ArrayList<ArrayList<Integer>> avgset(ArrayList<Integer> A) {
+        Collections.sort(A,Collections.reverseOrder());
+        ArrayList<ArrayList<Integer>> returnme=new ArrayList<>();
+        int totalSum=0;
+        for(int y:A){
+            totalSum+=y;
+        }
+        double average=(double)totalSum/A.size();
+        int value=-1,sum=0;
+        ArrayList<Integer> firstSet=new ArrayList<>();
+        boolean result[][]=solve(A,totalSum);
+        for(int y=1;y<A.size()-1;y++) {
+            if ((average * y) == (int) (average * y)) {
+                sum = (int) (average * y);
+                if(result[A.size()][sum])break;
+            }
+        }
+        if(sum==0)return  returnme;
+        return findAnswer(sum);
+    }
+    public ArrayList<ArrayList<Integer>> findAnswer(int sum){
+        return null;
+    }
+    public void findallSet(ArrayList<ArrayList<Integer>> result,ArrayList<Integer> temp,int sum,boolean[][] array,ArrayList<Integer> question){
+        if(sum<0)return;
+        if(sum==0){
+            ArrayList<Integer> addme=new ArrayList<>() ;
+            addme.addAll(temp) ;
+            result.add(addme);
+            return;
+        }
+        for(int row=1;row<array.length;row++){
+            if(array[row][sum]==true){
+                temp.add(question.get(row-1));
+                findallSet(result,temp,sum-question.get(row-1),array,question);
+                temp.remove(temp.size()-1);
+            }
+        }
+    }
+    public int findValue(boolean [][]array,int sum,ArrayList<Integer> A){
+        int result=-1;
+        if(array[0].length<sum)return -1;
+        for(int row=0;row<A.size();row++){
+            if(array[row][sum]==true){
+                return A.get(row-1);
+            }
+        }
+        return -1;
+    }
+    private boolean[][] solve(ArrayList<Integer> A, int B) {
+        boolean result[][]=new boolean[A.size()+1][B+1];
+        for(int r=0;r<A.size()+1;r++){
+            for(int c=0;c<B+1;c++){
+                if(c==0){result[r][c]=true;continue;}
+                if(r==0)continue;
+                if((A.get(r-1)==c) || result[r-1][c]==true){result[r][c]=true;continue;}
+                if(c>A.get(r-1) && result[r-1][c-A.get(r-1)]){
+                    result[r][c]=true;
+                }
+            }
+        }
+        return result;
     }
 
-    public int solve(ArrayList<Integer> A, ArrayList<Integer> B, int C) {
-        return 1;
+}
+/*
+    public int cnttrue(String A) {
+        trueResult.put("T",1);
+        trueResult.put("F",0);
+        falseResult.put("F",1);
+        falseResult.put("T",0);
+        int gap=3;
+        int i=0,j=i+gap,index=1;
+        while(gap<=A.length()) {
+            while (j <= A.length()) {
+                String value = A.substring(i, j);
+                index=1;
+                while(trueResult.get(value)==null && index<value.length()){
+                    filloperand(value,index);
+                    index+=2;
+                }
+                i+=2;
+                j+=2;
+                System.out.println(value);
+            }
+            i=0;
+            gap+=2;
+            j=i+gap;
+        }
+        return trueResult.get(A);
+    }
+    Map<String,Integer> trueResult=new HashMap<>();
+    Map<String,Integer> falseResult=new HashMap<>();
+    public void filloperand(String A,int index){
+        int value=0;
+        String left=A.substring(0,index);
+        String right=A.substring(index+1);
+        if(A.charAt(index)=='&'){
+            value=trueResult.get(left)*trueResult.get(right);
+            trueResult.put(A,value);
+            value=trueResult.get(left)*falseResult.get(right);
+            value+=falseResult.get(left)*trueResult.get(right);
+            value+=falseResult.get(left)*falseResult.get(right);
+            falseResult.put(A,falseResult.getOrDefault(A,0)+value);
+            return;
+        }
+        if(A.charAt(index)=='|'){
+            value=falseResult.get(left)*falseResult.get(right);
+            falseResult.put(A,value);
+            value=trueResult.get(left)*falseResult.get(right);
+            value+=falseResult.get(left)*trueResult.get(right);
+            value+=trueResult.get(left)*trueResult.get(right);
+            trueResult.put(A,trueResult.getOrDefault(A,0)+value);
+            return;
+        }
+        if(A.charAt(index)=='^'){
+            value=falseResult.get(left)*trueResult.get(right);
+            value+=falseResult.get(right)*trueResult.get(left);
+            trueResult.put(A,value);
+            value=falseResult.get(left)*falseResult.get(right);
+            value+=trueResult.get(left)*trueResult.get(right);
+            falseResult.put(A,falseResult.getOrDefault(A,0)+value);
+        }
+    }
+}
+/*
+    public int solve(int[][] A) {
+        int max=1,local=1;
+        for(int y=0;y<A.length-1;y++){
+            local=1;
+            for(int j=y+1;j<A.length;j++){
+                if(A[y][1]<A[j][0])local++;
+            }
+            max=Math.max(max,local);
+        }
+        return max;
+    }
+
+    public int solve(ArrayList<Integer> value, ArrayList<Integer> weight, int max) {
+        int array[][]=new int[value.size()+1][max+1];
+        for(int row=1;row<=value.size();row++){
+            for(int c=1;c<=max;c++){
+                if(weight.get(row-1)>c){array[row][c]=array[row-1][c];}
+                if(weight.get(row-1)==c){array[row][c]=Math.max(array[row-1][c],value.get(row-1));continue;}
+                if(weight.get(row-1)<c){
+                    array[row][c]=Math.max(array[row-1][c],value.get(row-1)+array[row-1][c-weight.get(row-1)]);
+                }
+            }
+        }
+        return array[value.size()][max];
     }
 
 }
