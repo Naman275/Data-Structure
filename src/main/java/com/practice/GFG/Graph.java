@@ -23,19 +23,296 @@ class ListNode {
 public class Graph {
     public static void main(String[] args) {
         Graph g = new Graph();
-        ArrayList<String> a = new ArrayList<>();
-        a.add("hot");
-        a.add("dot");
-        a.add("dog");
-        a.add("lot");
-        a.add("log");
-        a.add("cog");
-        String A = "hit", B = "cog";
+        int ar[]={114,117,207,117,235,82,90,67,143,146,53,108,200,91,80,223,58,170,110,236,81,90,222,160,165,195,187,
+                199,114,235,197,187,69,129,64,214,228,78,188,67,205,94,205,169,241,202,144,240};
+        int answer=g.rob(ar);
+        System.out.println(answer);
     }
-    public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
+    public int rob(int[] nums) {
+        int max=0;
+        if(nums.length<=2){
+            for(int loot:nums){
+                max=Math.max(loot,max);
+            }
+            return max;
+        }
+        return findMax(nums,0,0,0);
+    }
+    public int findMax(int []nums,int start,int max,int local){
+        max=Math.max(max,local);
+        System.out.println("start="+start);
+        if(start>=nums.length)return max;
+        {
+            local+=nums[start];
+            max=findMax(nums,start+2,max,local);
+            local-=nums[start];
+            max=findMax(nums,start+1,max,local);
+        }
+        return max;
+    }
 
-        return null;
+    public void checkit(){
+        System.out.println(8<<0);
+        System.out.println(8<<1);
     }
+
+    public int divide(int A, int B) {
+        int sign=(A<0 ^ B<0)==true?-1:1;
+        long a=Math.abs((long)A),b=Math.abs(B);
+        long divident=0;
+        long temp=0;
+        for(int y=31;y>=0;y--){
+            if((temp+(b<<y) <=a)){
+                temp=temp+(b<<y);
+                divident+= 1L<<y;
+            }
+        }
+        divident=sign*divident;
+        return divident>Integer.MAX_VALUE?Integer.MAX_VALUE:(int)divident;
+    }
+
+    Map<Integer, Set<String>> forwardLevelwise = new HashMap<>();
+    Stack<Set<String>> backwardLevelwise=new Stack<>();
+    public int findminimum(String beginWord,String endWord,Set<String> wordList) {
+        if (!wordList.contains(endWord)) return 0;
+        Queue<String> forward = new LinkedList<>();
+        Set<String> fs = new HashSet<>();
+        fs.add(beginWord);
+        Queue<String> backward = new LinkedList<>();
+        Set<String> bs = new HashSet<>();
+        bs.add(endWord);
+        Set<String> visited = new HashSet<>();
+        forward.add(beginWord);
+        backward.add(endWord);
+        StringBuilder sb = null;
+        Set<String> aaa=new HashSet<>();aaa.add(beginWord);
+        Set<String> bbb=new HashSet<>();bbb.add(endWord);
+        forwardLevelwise.put(1,aaa);Set<String> forwardList=null;
+        backwardLevelwise.push(bbb);Set<String> backwardList=null;
+        int fc = 1, bc = 1;
+        while (!forward.isEmpty() && !backward.isEmpty()) {
+            fc++;
+            int size = forward.size();
+            forwardList=new HashSet<>();
+            while (size-- > 0) {
+                String temp = forward.poll();
+                sb = new StringBuilder(temp);
+                char oldchar;
+                for (int y = 0; y < temp.length(); y++) {
+                    oldchar = sb.charAt(y);
+                    for (char a = 'a'; a <= 'z'; a++) {
+                        sb.setCharAt(y, a);
+                        if (forwardList.contains(sb.toString()) || visited.contains(sb.toString())) continue;
+                        if (bs.contains(sb.toString())) {
+                            return fc + bc - 1;
+                        }
+                        if (!sb.toString().equals(temp) && wordList.contains(sb.toString())) {
+                            forwardList.add(sb.toString());
+                            fs.add(temp);
+                            fs.add(sb.toString());
+                            forward.add(sb.toString());
+                        }
+                    }
+                    sb.setCharAt(y, oldchar);
+                }
+                visited.add(temp);
+            }
+            forwardLevelwise.put(fc,forwardList);
+            size = backward.size();
+            bc++;
+            backwardList=new HashSet<>();
+            while (size-- > 0) {
+
+                String temp = backward.poll();
+                sb = new StringBuilder(temp);
+                char oldchar;
+                for (int y = 0; y < temp.length(); y++) {
+                    oldchar = sb.charAt(y);
+                    for (char a = 'a'; a <= 'z'; a++) {
+                        sb.setCharAt(y, a);
+                        if (backwardList.contains(sb.toString()) || visited.contains(sb.toString())) continue;
+                        if (fs.contains(sb.toString())) {
+                            return fc + bc - 1;
+                        }
+                        if (!temp.equals(sb.toString()) && wordList.contains(sb.toString())) {
+                            backwardList.add(sb.toString());
+                            bs.add(temp);
+                            bs.add(sb.toString());
+                            backward.add(sb.toString());
+                        }
+                    }
+                    sb.setCharAt(y, oldchar);
+                }
+
+                visited.add(temp);
+            }
+            backwardLevelwise.push(backwardList);
+        }
+        return 0;
+    }
+    public List<List<String>> findLadders(String beginWord, String endWord, List<String> list) {
+        List<List<String>> result=new ArrayList<>();
+        Set<String> wordList=new HashSet<>();
+        for(String s:list)wordList.add(s);
+
+        if(!wordList.contains(endWord))return result;
+        if(!wordList.contains(beginWord))wordList.add(beginWord);
+
+        findminimum(beginWord,endWord,wordList);
+
+
+        ArrayList<String> useme=null;
+        StringBuilder sb=new StringBuilder();
+        char oldchar;
+
+        int lastSize=forwardLevelwise.size()+1;
+        while (!backwardLevelwise.isEmpty())forwardLevelwise.put(lastSize++,backwardLevelwise.pop());
+        ArrayList<String> usemeplz=new ArrayList<>();usemeplz.add(beginWord);
+
+        traverse(result,usemeplz,2,beginWord);
+        return result;
+    }
+    public void traverse( List<List<String>> result,ArrayList<String> local,int counter,String value){
+
+        if(counter>forwardLevelwise.size()){
+
+            result.add(new ArrayList<>(local));
+
+            return;
+        }
+        for(int y=0;y<value.length();y++){
+            StringBuilder sb=new StringBuilder(value);
+            char oldchar=sb.charAt(y);
+            for(char a='a';a<='z';a++){
+                sb.setCharAt(y,a);
+                if(forwardLevelwise.get(counter).contains(sb.toString())){
+                    local.add(sb.toString());
+                    traverse(result,local,counter+1,sb.toString());
+                    local.remove(local.size()-1);
+                }
+            }
+            sb.setCharAt(y,oldchar);
+        }
+    }
+}
+/*
+    public int findminimum(String beginWord,String endWord,Set<String> wordList) {
+        if (!wordList.contains(endWord)) return 0;
+        Queue<String> forward = new LinkedList<>();
+        Set<String> fs = new HashSet<>();
+        fs.add(beginWord);
+        Queue<String> backward = new LinkedList<>();
+        Set<String> bs = new HashSet<>();
+        bs.add(endWord);
+        Set<String> visited = new HashSet<>();
+        forward.add(beginWord);
+        backward.add(endWord);
+        StringBuilder sb = null;
+        Set<String> aaa=new HashSet<>();aaa.add(beginWord);
+        Set<String> bbb=new HashSet<>();bbb.add(endWord);
+        forwardLevelwise.put(1,aaa);Set<String> forwardList=null;
+        backwardLevelwise.push(bbb);Set<String> backwardList=null;
+        int fc = 1, bc = 1;
+        while (!forward.isEmpty() && !backward.isEmpty()) {
+            fc++;
+            int size = forward.size();
+            forwardList=new HashSet<>();
+            while (size-- > 0) {
+                String temp = forward.poll();
+                sb = new StringBuilder(temp);
+                char oldchar;
+                for (int y = 0; y < temp.length(); y++) {
+                    oldchar = sb.charAt(y);
+                    for (char a = 'a'; a <= 'z'; a++) {
+                        sb.setCharAt(y, a);
+                        if (visited.contains(sb.toString())) continue;
+                        if (bs.contains(sb.toString())) {
+                            return fc + bc - 1;
+                        }
+                        if (!sb.toString().equals(temp) && wordList.contains(sb.toString())) {
+                            forwardList.add(sb.toString());
+                            fs.add(temp);
+                            visited.add(temp);
+                            fs.add(sb.toString());
+                            forward.add(sb.toString());
+                        }
+                    }
+                    sb.setCharAt(y, oldchar);
+                }
+            }
+            forwardLevelwise.put(fc,forwardList);
+            size = backward.size();
+            bc++;
+            while (size-- > 0) {
+                backwardList=new HashSet<>();
+                String temp = backward.poll();
+                sb = new StringBuilder(temp);
+                char oldchar;
+                for (int y = 0; y < temp.length(); y++) {
+                    oldchar = sb.charAt(y);
+                    for (char a = 'a'; a <= 'z'; a++) {
+                        sb.setCharAt(y, a);
+                        if (visited.contains(sb.toString())) continue;
+                        if (fs.contains(sb.toString())) {
+                            return fc + bc - 1;
+                        }
+                        if (!temp.equals(sb.toString()) && wordList.contains(sb.toString())) {
+                            backwardList.add(sb.toString());
+                            bs.add(temp);
+                            visited.add(temp);
+                            bs.add(sb.toString());
+                            backward.add(sb.toString());
+                        }
+                    }
+                    sb.setCharAt(y, oldchar);
+                }
+                backwardLevelwise.push(backwardList);
+            }
+        }
+        return 0;
+    }
+    public List<List<String>> findLadders(String beginWord, String endWord, List<String> list) {
+        List<List<String>> result=new ArrayList<>();
+        Set<String> wordList=new HashSet<>();
+        for(String s:list)wordList.add(s);
+
+        if(!wordList.contains(endWord))return result;
+        if(!wordList.contains(beginWord))wordList.add(beginWord);
+
+        findminimum(beginWord,endWord,wordList);
+
+
+        ArrayList<String> useme=null;
+        StringBuilder sb=new StringBuilder();
+        char oldchar;
+
+        int lastSize=forwardLevelwise.size()+1;
+        while (!backwardLevelwise.isEmpty())forwardLevelwise.put(lastSize++,backwardLevelwise.pop());
+        ArrayList<String> usemeplz=new ArrayList<>();usemeplz.add(beginWord);
+        traverse(result,usemeplz,2,beginWord);
+        return result;
+    }
+    public void traverse( List<List<String>> result,ArrayList<String> local,int counter,String value){
+        if(counter>forwardLevelwise.size()){
+            result.add(new ArrayList<>(local));
+            return;
+        }
+        StringBuilder sb=new StringBuilder(value);
+        for(int y=0;y<value.length();y++){
+            char oldchar=sb.charAt(y);
+
+            for(char a='a';a<='z';a++){
+                sb.setCharAt(y,a);
+                if(forwardLevelwise.get(counter).contains(sb.toString())){
+                    local.add(sb.toString());
+                    traverse(result,local,counter+1,sb.toString());
+                    local.remove(local.size()-1);
+                }
+            }
+            sb.setCharAt(y,oldchar);
+        }
+    }
+
 }
 /*
     public int solve(String beginWord, String endWord, ArrayList<String> wordList) {
