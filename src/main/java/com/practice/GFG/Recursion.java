@@ -6,14 +6,71 @@ import java.util.*;
 public class Recursion {
     public static void main(String[] args) {
         Recursion r = new Recursion();
-        int [][]a=new int[][]{
-                {1,10}
-        };
-        int [][]b=new int[][]{
-                {2,3},
-                {5,7}
-        };
-        r.meetingPlanner(a,b,2);
+        int array[]={0,0,5,5,0,0};
+        System.out.println(r.findSubarray(array,9));
+    }
+    static void sortBySetBitCount(Integer arr[], int n)
+    {
+        Arrays.sort(arr, new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return findSetBit(01)-findSetBit(o2);
+            }
+        });
+    }
+    static int findSetBit(int no){
+        int count=0;
+        while(no!=0){
+            no=(no&no-1);
+            count++;
+        }
+        return count;
+    }
+    public static int findSubarray(int[] arr ,int n) {
+        // 0 0 5 5 10 0 0
+        // 0 0 chan
+        int count = 0, sum = 0, temp = 0;
+        Map<Integer, Integer> mapSumToCount = new HashMap<>();
+        for (int y = 0; y < arr.length; y++) {
+            sum += arr[y];
+            if(sum==0)count++;
+            if (mapSumToCount.get(sum) != null) {
+                count += mapSumToCount.get(sum);
+            }
+            temp = mapSumToCount.getOrDefault(sum, 0);
+            mapSumToCount.put(sum, temp + 1);
+        }
+        return count;
+    }
+    public String smallestnum(String N)
+    {
+        Map<Integer,Integer> mapNoToCount=new HashMap<>();
+        int y=0,no=0;
+        while(y<N.length()){
+            no=Integer.parseInt(""+N.charAt(y));
+            int value=mapNoToCount.getOrDefault(no,0);
+            mapNoToCount.put(no,value+1);
+            y++;
+        }
+        boolean first=true;
+        StringBuilder sb=new StringBuilder();
+        for(int z=1;z<=9;z++){
+           if(mapNoToCount.get(z)!=null){
+               int value=mapNoToCount.get(z);
+               while(value-->0){
+                   sb.append(z);
+               }
+               if(first==true && mapNoToCount.get(0)!=null){
+                   value=mapNoToCount.get(0);
+                   while(value-->0){
+                       sb.append(0);
+                   }
+                   first=false;
+               }
+           }
+        }
+        return sb.toString();
+        //code here
     }
     public int[] meetingPlanner(int[][] slotsA, int[][] slotsB, int dur) {
         List<Integer> result=new ArrayList<Integer>();
