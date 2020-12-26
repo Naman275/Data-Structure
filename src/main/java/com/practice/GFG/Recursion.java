@@ -6,8 +6,95 @@ import java.util.*;
 public class Recursion {
     public static void main(String[] args) {
         Recursion r = new Recursion();
-        int array[]={0,0,5,5,0,0};
-        System.out.println(r.findSubarray(array,9));
+        Integer array[]={73, 58, 30, 72, 44, 78, 23, 9};
+        int startTime[]={1,2,3,4,6};
+        int endTime[]={3,5,10,6,9};
+        int profit[]={20,20,100,70,60};
+        System.out.println(r.jobScheduling(startTime,endTime,profit));
+    }
+    //https://leetcode.com/problems/maximum-profit-in-job-scheduling/
+    class Job{
+        int startTime,endTime,profit;
+        Job(int s,int e,int profit){this.startTime=s;this.endTime=e;this.profit=profit;}
+    }
+    public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
+        List<Job> jobList=new ArrayList<>();
+        for(int y=0;y<startTime.length;y++){
+            jobList.add(new Job(startTime[y],endTime[y],profit[y]));
+        }
+        Collections.sort(jobList, new Comparator<Job>() {
+            @Override
+            public int compare(Job job, Job t1) {
+                return job.endTime-t1.endTime;
+            }
+        });
+        int low=0,high=0,mid=0,max=0;
+        int result[]=new int[jobList.size()];
+        result[0]=jobList.get(0).profit;
+        max=result[0];
+        Job temp,curr;
+        for(int y=1;y<jobList.size();y++){
+            low=0;high=y-1;
+            while (low<=high){
+                mid=(low+high)/2;
+                temp=jobList.get(mid);
+                curr=jobList.get(y);
+                result[y]=Math.max(result[y-1],result[y]);
+                result[y]=Math.max(result[y],curr.profit);
+                if(curr.startTime>=temp.endTime){
+                    result[y]=Math.max(result[y-1],result[mid]+curr.profit);
+                    max=Math.max(max,result[y]);
+                    low=mid+1;
+                    continue;
+                }
+                high=mid-1;
+                max=Math.max(max,result[y]);
+            }
+        }
+        return max;
+    }
+    //https://www.interviewbit.com/problems/allocate-books/
+    public int books(List<Integer> A, int B) {
+        int max=Integer.MIN_VALUE,sum=0;
+        for(int value:A){
+            max=Math.max(max,value);
+            sum+=value;
+        }
+        int low=max,high=sum,mid=0,localmax=0,localsum=0,total=0,index=0,
+                result=Integer.MAX_VALUE;
+        while(low<=high){
+            mid=(low+high)/2;
+            total=B;
+            localsum=0;
+            index=0;
+            localmax=0;
+            while(index<A.size() && total!=0){
+                if((localsum+A.get(index))>mid){
+                    localmax=Math.max(localmax,localsum);
+                    total--;
+                    localsum=0;
+                    continue;
+                }
+                localsum+=A.get(index);
+                index++;
+            }
+            localmax=Math.max(localmax,localsum);
+            if(index!=A.size()){
+                low=mid+1;
+            }
+            else {
+                high=mid-1;
+                result=Math.min(result,localmax);
+            }
+        }
+        return result;
+    }
+    //kth largest element
+    public int findKthLargest(int[] nums, int k) {
+        Queue<Integer> priorityQueue=new PriorityQueue<>(Collections.reverseOrder());
+        for(int z:nums)priorityQueue.add(z);
+        while (k-->1)priorityQueue.poll();
+        return priorityQueue.poll();
     }
     static void sortBySetBitCount(Integer arr[], int n)
     {
