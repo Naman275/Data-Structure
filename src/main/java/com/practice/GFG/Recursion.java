@@ -5,12 +5,24 @@ import java.util.*;
 
 public class Recursion {
     public static void main(String[] args) {
+
         Recursion r = new Recursion();
         Integer array[]={73, 58, 30, 72, 44, 78, 23, 9};
         int startTime[]={1,2,3,4,6};
         int endTime[]={3,5,10,6,9};
         int profit[]={20,20,100,70,60};
-        System.out.println(r.jobScheduling(startTime,endTime,profit));
+        System.out.println(r.inSequence(10,10,0));
+
+
+    }
+    int inSequence(int A, int B, int C){
+        // code here
+        double value=(double)(B-A)/C;
+        int va=(int)value;
+        if(va==value && va>0){
+            return 1;
+        }
+        return 0;
     }
     //https://leetcode.com/problems/maximum-profit-in-job-scheduling/
     class Job{
