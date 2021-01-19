@@ -1,19 +1,72 @@
 package com.practice.GFG;
 
-import java.lang.reflect.Array;
+import org.apache.commons.lang3.StringUtils;
+
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+
 public class Recursion {
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         Recursion r = new Recursion();
-        Integer array[]={73, 58, 30, 72, 44, 78, 23, 9};
-        int startTime[]={1,2,3,4,6};
-        int endTime[]={3,5,10,6,9};
-        int profit[]={20,20,100,70,60};
-        System.out.println(r.inSequence(10,10,0));
+        String ab="ab";
 
-
+        int [][]ar={{-10,-8},{8,9},{-5,0},{6,10},{-6,-4},{1,7},{9,10},{-4,7}};
+        r.findLongestChain(ar);
+        int []array={186,419,83,408};
+        // r.coinChange(array,6249);
+    }
+    //https://leetcode.com/problems/maximum-length-of-pair-chain/
+    public int findLongestChain(int[][] pairs) {
+        Arrays.sort(pairs, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] ints, int[] t1) {
+                return ints[1]-t1[1];
+            }
+        });
+        int chainValue[]=new int[pairs.length+1];
+        chainValue[0]=1;
+        int low,high,mid,target,value=0;
+        for(int y=1;y<pairs.length;y++){
+            value=0;
+            low=0;high=y;target=pairs[y][0]-1;
+            while(low<=high){
+                mid=(low+high)/2;
+                if(target>pairs[mid][1]){
+                    value=chainValue[mid];
+                    low=mid+1;
+                    continue;
+                }
+                if(target<pairs[mid][1]){
+                    high=mid-1;
+                    continue;
+                }
+                value=chainValue[mid];
+                low=mid+1;
+            }
+            chainValue[y]=Math.max(chainValue[y-1],value+1);
+        }
+        return chainValue[pairs.length-1];
+    }
+    //https://leetcode.com/problems/coin-change/
+    public int coinChange(int[] coins, int amount) {
+        if(amount==0)return 0;
+        int coinRequired[]=new int[amount+1];
+        Arrays.fill(coinRequired,-1);
+        coinRequired[0]=0;
+        int previousValue=0;
+        for (int coin:coins){
+            for(int y=coin;y<=amount;y++){
+                if(y==coin){
+                    coinRequired[y]=1;
+                    continue;}
+                previousValue=coinRequired[y-coin];
+                if(previousValue==-1){continue;}
+                if(coinRequired[y]==-1)coinRequired[y]=previousValue+1;
+                else coinRequired[y]=Math.min(coinRequired[y],previousValue+1);
+            }
+        }
+        return coinRequired[amount];
     }
     int inSequence(int A, int B, int C){
         // code here
