@@ -26,6 +26,7 @@ public class LeetCode {
             left = right = null;
         }
     }
+
     //https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/submissions/
     public List<List<Integer>> verticalTraversal(TreeNode root) {
         TreeMap<Integer,TreeMap<Integer,List<Integer>>> mapit=new TreeMap<>();
