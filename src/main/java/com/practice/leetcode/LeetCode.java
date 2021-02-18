@@ -1,15 +1,259 @@
 package com.practice.leetcode;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.practice.GFG.tree;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class LeetCode {
     public static void main(String[] args){
         LeetCode leetCode=new LeetCode();
-        leetCode.isInterleave("aabcc","dbbca","aadbbcbcac");
+        leetCode.checkME();
+        System.out.println(minJumps(new int[]{2 ,3 ,1, 1, 2, 4 ,2 ,0 ,1 ,1}));
+        // 10 17 5 3
+        //
+    }
+    class Node
+    {
+        int data;
+        Node left, right;
+
+        Node(int item)
+        {
+            data = item;
+            left = right = null;
+        }
+    }
+    //https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/submissions/
+    public List<List<Integer>> verticalTraversal(TreeNode root) {
+        TreeMap<Integer,TreeMap<Integer,List<Integer>>> mapit=new TreeMap<>();
+        traverse(root,0,0,mapit);
+        List<List<Integer>> result=new ArrayList<>();
+        for(int key:mapit.keySet()){
+            List<Integer> addme=new ArrayList<>();
+            TreeMap<Integer,List<Integer>> temp=mapit.get(key);
+            for(int innerKey:temp.keySet()){
+                addme.addAll(temp.get(innerKey));
+            }
+            result.add(addme);
+        }
+        return result;
+    }
+    public void traverse(TreeNode root,int horizontal,int height,TreeMap<Integer,TreeMap<Integer,List<Integer>>> mapit){
+        if(root==null)return;
+        TreeMap<Integer, List<Integer>> htemp=mapit.getOrDefault(horizontal,new TreeMap<>());
+        List<Integer> addme=htemp.getOrDefault(height,new ArrayList<>());
+        addme.add(root.val);
+        Collections.sort(addme);
+        htemp.put(height,addme);
+        mapit.put(horizontal,htemp);
+        traverse(root.left,horizontal-1,height+1,mapit);
+        traverse(root.right,horizontal+1,height+1,mapit);
+    }
+
+     public  ArrayList<Integer> topView(Node root)
+    {
+        ArrayList<Integer> result=new ArrayList<>();
+        Map<Integer,List<Integer>> mapit=new HashMap<>();
+        verticalOrder(root,0,mapit);
+        List<Integer> lvlorder=levelOrder(root);
+        List<Integer> keyset=new ArrayList<>();
+        keyset.addAll(mapit.keySet());
+        Collections.sort(keyset,Collections.reverseOrder());
+        int index=Integer.MAX_VALUE;
+        for(int key:keyset){
+            List<Integer> values=mapit.get(key);
+            if(values.size()==1){
+                result.add(values.get(0));
+                continue;
+            }
+            else
+            {
+                index=Integer.MAX_VALUE;
+                for(int val:values){
+                    index=Math.min(index,lvlorder.indexOf(val));
+                }
+            }
+            result.add(values.get(index));
+        }
+        return result;
+    }
+    public List<Integer> levelOrder(Node root){
+        List<Integer> lvlorder=new ArrayList<>();
+        Queue<Node> q=new LinkedList<>();
+        q.add(root);
+        while (!q.isEmpty()){
+            int size=q.size();
+            while (size-->0){
+                Node temp=q.poll();
+                lvlorder.add(temp.data);
+                if(temp.left!=null)q.add(temp.left);
+                if(temp.right!=null)q.add(temp.right);
+            }
+        }
+        return lvlorder;
+    }
+    public void verticalOrder(Node root,int index,Map<Integer,List<Integer>> mapit){
+        if(root==null)return;
+        List<Integer> addme=mapit.getOrDefault(index,new ArrayList<>());
+        addme.add(root.data);
+        mapit.put(index,addme);
+        verticalOrder(root.left,index-1,mapit);
+        verticalOrder(root.right,index+1,mapit);
+        return;
+    }
+   // https://leetcode.com/problems/binary-tree-right-side-view/
+
+      public class TreeNode {
+          int val;
+          TreeNode left;
+         TreeNode right;
+        TreeNode() {}
+          TreeNode(int val) { this.val = val; }
+          TreeNode(int val, TreeNode left, TreeNode right) {
+              this.val = val;
+              this.left = left;
+              this.right = right;
+          }
+      }
+
+    public List<Integer> rightSideView(TreeNode root) {
+        List<Integer> result=new ArrayList<>();
+        Queue<TreeNode> q=new LinkedList<>();
+        TreeNode node;
+        if(root!=null)q.add(root);
+        int size=0;boolean first=true;
+        while (!q.isEmpty()){
+            size=q.size();
+            while (size>0){
+                node=q.poll();
+                if(first){
+                    result.add(node.val);first=false;
+                }
+                if(node.right!=null)q.add(node.right);
+                if(node.left!=null)q.add(node.left);
+                size--;
+            }
+            first=true;
+        }
+        return result;
+
+    }
+    //https://practice.geeksforgeeks.org/problems/minimum-number-of-jumps-1587115620/1
+    static int minJumps(int[] arr){
+        // your code here
+        int allowed=arr[0],max=arr[0],position=1,jump=1;
+        while(position<arr.length){
+            if(max==0)return -1;
+            if(allowed<position){
+                allowed=max;
+                jump++;
+                if(allowed>=arr.length-1)return jump;
+            }
+            max=Math.max(max,position+arr[position]);
+            position++;
+        }
+        return jump;
+    }
+    //https://practice.geeksforgeeks.org/problems/maximum-difference-of-zeros-and-ones-in-binary-string4111/1
+    static int maxSubstring(String S) {
+        // code here
+        int result=0,sum=0;
+        int a=0,value=1;
+        while(a<S.length()){
+            value=1;
+            if(S.charAt(a)=='1')value=-1;
+            if((sum+value)<=0){
+                sum=0;
+            }
+            sum+=value;
+            result=Math.max(result,sum);
+            a++;
+        }
+        return result;
+    }
+    static int countFriendsPairings(int n)
+    {
+        int a = 1, b = 2, c = 0;
+        if (n <= 2) {
+            return n;
+        }
+        for (int i = 3; i <= n; i++) {
+            c = b + (i - 1) * a;
+            a = b;
+            b = c;
+        }
+        return c;
+    }
+
+    class testMe{
+         String entityType;
+         String entityId;
+         String taskName;
+    }
+    public void checkME() {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String empty = "";
+            testMe r = objectMapper.readValue(empty, testMe.class);
+        }
+        catch (IOException jk){
+            System.out.println("Fhfh");
+        }
+    }
+    //https://leetcode.com/problems/max-sum-of-rectangle-no-larger-than-k/
+    public int maxSumSubmatrix(int[][] matrix, int k) {
+        int leftColumn=0,rightColumn=0,sum=0,max=0,result=0;
+        int temp[]=new int[matrix[0].length];
+        while(leftColumn!=matrix.length){
+            rightColumn=leftColumn;
+            for(int y=leftColumn;y<=rightColumn;y++){
+                for(int row=0;row<matrix.length;row++){
+                    temp[row]+=matrix[row][y];
+                }
+            }
+            temp=new int[matrix[0].length];
+            max=temp[0];
+            for(int t:temp){
+                if((sum+t)<k){
+
+                }
+                sum+=t;
+                max=Math.max(max,sum);
+                if(sum<0)sum=0;
+            }
+            leftColumn++;
+        }
+        return 0;
+    }
+    // https://practice.geeksforgeeks.org/problems/optimal-strategy-for-a-game-1587115620/1
+    static long countMaximum(int arr[], int n){
+        // Your code here
+        return findResult(arr,0,arr.length-1,true);
+    }
+    static Map<String,Long> result=new HashMap<>();
+
+    static long findResult(int arr[],int startIndex,int endIndex,boolean pick){
+        if(endIndex<startIndex)return 0;
+        if(pick==true && endIndex==startIndex)return arr[startIndex];
+        if(pick==false && endIndex==startIndex)return 0;
+        String key=startIndex+":"+endIndex;
+        if(result.containsKey(key))result.get(key);
+        long nextValue=0;
+        if(pick) {
+            nextValue = Math.max(arr[startIndex] + findResult(arr, startIndex + 1, endIndex,!pick)
+                    , arr[endIndex] + findResult(arr, startIndex, endIndex - 1,!pick));
+        }
+        else {
+            if(arr[startIndex]>arr[endIndex])
+            nextValue = findResult(arr, startIndex + 1, endIndex,!pick);
+            else
+                nextValue=findResult(arr, startIndex, endIndex - 1,!pick);
+        }
+        result.put(key,nextValue);
+        return nextValue;
     }
     // https://practice.geeksforgeeks.org/problems/mobile-numeric-keypad5456/1
     public int calculateSum(int [][]array,int column[],int row){
