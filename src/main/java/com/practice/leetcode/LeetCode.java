@@ -15,7 +15,74 @@ public class LeetCode {
         // 10 17 5 3
         //
     }
-    class Node
+    //https://leetcode.com/problems/find-duplicate-subtrees
+    public List<TreeNode> findDuplicateSubtrees(TreeNode root) {
+        Map<String,TreeNode> unique=new HashMap<>();
+        Set<TreeNode> result=new HashSet<>();
+        traverse(root,unique,result);
+        return new ArrayList<>(result);
+    }
+    public String traverse(TreeNode root,Map<String,TreeNode> mapit,Set<TreeNode> result){
+        if(root==null){
+            return "";
+        }
+        String key="R:"+root.val;
+        String left=traverse(root.left,mapit,result);
+        String right=traverse(root.right,mapit,result);
+        key=key+"L:"+left+"R:"+right;
+        if(mapit.get(key)!=null){
+            result.add(mapit.get(key));
+        }
+        else
+        {
+            mapit.put(key,root);
+        }
+        return key;
+    }
+    //https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if(root==null || root==p || root ==q )return root;
+        TreeNode left=lowestCommonAncestor(root.left,p,q);
+        TreeNode right=lowestCommonAncestor(root.right,p,q);
+        if(left!=null && right != null)return root;
+        if(left!=null)return left;
+        return right;
+    }
+    // https://leetcode.com/problems/binary-tree-maximum-path-sum
+    public int maxPathSum(TreeNode root) {
+        traverseSum(root);
+        return max;
+    }
+    int max=Integer.MIN_VALUE;
+    public int traverseSum(TreeNode root){
+        if(root==null)return 0;
+        int leftSum=traverseSum(root.left);
+        int rightSum=traverseSum(root.right);
+        int cmax=Math.max(root.val+leftSum,root.val+rightSum);
+        cmax=Math.max(root.val,cmax);
+        cmax=Math.max(cmax,root.val+leftSum+rightSum);
+        max=Math.max(max,cmax);
+        return Math.max(Math.max(root.val,root.val+leftSum),root.val+rightSum);
+    }
+    //https://leetcode.com/problems/path-sum-iii/
+    public int pathSum(TreeNode root, int sum) {
+        traverseSum(root,sum,new ArrayList<>());
+        return count;
+    }
+    int count=0;
+    public void traverseSum(TreeNode root,int sum , List<Integer> list){
+        if(root==null)return ;
+        list.add(root.val);
+        int local=0;
+        for(int y=list.size()-1;y>=0;y--){
+            local+=list.get(y);
+            if(local==sum)count++;
+        }
+        traverseSum(root.left,sum,list);
+        traverseSum(root.right,sum,list);
+        list.remove(list.size()-1);
+    }
+    private class Node
     {
         int data;
         Node left, right;
@@ -26,7 +93,6 @@ public class LeetCode {
             left = right = null;
         }
     }
-
     //https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/submissions/
     public List<List<Integer>> verticalTraversal(TreeNode root) {
         TreeMap<Integer,TreeMap<Integer,List<Integer>>> mapit=new TreeMap<>();

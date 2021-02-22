@@ -17,10 +17,69 @@ public class Tree1 {
             left = right = null;
         }
     }
+    //https://practice.geeksforgeeks.org/problems/check-if-tree-is-isomorphic/1
+    boolean isIsomorphic(Node root1, Node root2)
+    {
+        if(root1==null && root2==null) return true;
+        if((root1 ==null ^ root2 ==null )|| root1.data!=root2.data)return false;
+        // code here.
+        return isIsomorphic(root1.left,root2.left)
+                || isIsomorphic(root1.right,root2.left);
+    }
+    //https://practice.geeksforgeeks.org/problems/duplicate-subtree-in-binary-tree/1
+    public List<Node> findDuplicateSubtrees(Node root) {
+        Map<String,Node> unique=new HashMap<>();
+        Set<Node> result=new HashSet<>();
+        traverse(root,unique,result);
+        return new ArrayList<Node>(result);
+    }
+    public String traverse(Node root, Map<String,Node> mapit, Set<Node> result){
+        if(root==null){
+            return "";
+        }
+        String key="R:"+root.data;
+        String left=traverse(root.left,mapit,result);
+        String right=traverse(root.right,mapit,result);
+        if(left.equals("") || right.equals(""))return key;
+        key=key+"L:"+left+"R:"+right;
+        if(mapit.get(key)!=null){
+            result.add(mapit.get(key));
+        }
+        else
+        {
+            mapit.put(key,root);
+        }
+        return key;
+    }
     public static void main(String [] args){
         Tree1 t=new Tree1();
         Node root=t.buildTree(new int[]{3,1,4,0, 5 ,2},new int[]{0, 1, 3 ,4 ,2 ,5},6);
         System.out.println(root.data);
+    }
+    //https://practice.geeksforgeeks.org/problems/leaf-at-same-level/1
+    int leaveLevel=-1;
+    boolean allow=true;
+    boolean check(Node root)
+    {
+        // Your code here
+        traverse(root,0);
+        return allow;
+    }
+    public void traverse(Node root,int height){
+        if(root==null)return;
+        if(root.left==null && root.right==null){
+            if(leaveLevel==-1){
+                leaveLevel=height;
+                return;
+            }
+            if(leaveLevel!=height)allow=false;return;
+        }
+        if(allow){
+            traverse(root.left,height+1);
+        }
+        if(allow){
+            traverse(root.right,height+1);
+        }
     }
     //https://practice.geeksforgeeks.org/problems/sum-tree/1
     boolean result=true;
