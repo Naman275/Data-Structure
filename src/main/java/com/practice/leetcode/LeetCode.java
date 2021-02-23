@@ -1,10 +1,7 @@
 package com.practice.leetcode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.practice.GFG.tree;
-
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class LeetCode {
@@ -14,6 +11,124 @@ public class LeetCode {
         System.out.println(minJumps(new int[]{2 ,3 ,1, 1, 2, 4 ,2 ,0 ,1 ,1}));
         // 10 17 5 3
         //
+    }
+    //https://leetcode.com/problems/kth-smallest-element-in-a-bst
+    public int kthSmallest(TreeNode root, int k) {
+        count=k;
+        traverse(root);
+        if(count>=1)return -1;
+        return no;
+    }
+    public void traverse(TreeNode root){
+        if(root==null || allow==false)return;
+        traverse(root.left);
+        count--;
+        if(count==0){
+            no=root.val;
+            allow=false;
+        }
+        traverse(root.right);
+    }
+    int count=0,no=0;
+    boolean allow=true;
+    // https://leetcode.com/problems/balance-a-binary-search-tree
+    public TreeNode balanceBST(TreeNode root) {
+        List<TreeNode> list=new ArrayList<>();
+        traverse(root,list);
+        return buildUp(0,list.size()-1,list);
+    }
+    public TreeNode buildUp(int min,int max,List<TreeNode> list){
+        if(min<0 || max>=list.size() || min>max)return null;
+        TreeNode newroot=(list.get((min+max)/2));
+        newroot.left=buildUp(min,((min+max)/2)-1,list);
+        newroot.right=buildUp(((min+max)/2)+1,max,list);
+        return newroot;
+    }
+    public void traverse(TreeNode root,List<TreeNode> list){
+        if(root==null)return;
+        traverse(root.left,list);
+        list.add(root);
+        traverse(root.right,list);
+    }
+    //https://leetcode.com/problems/construct-binary-search-tree-from-preorder-traversal
+    public TreeNode bstFromPreorder(int[] preorder) {
+        return bstFromPreorder(preorder,Integer.MAX_VALUE,Integer.MIN_VALUE);
+    }
+    int index=0;
+    public TreeNode bstFromPreorder(int[] preorder,
+                                    int max,int min) {
+        if(index>=preorder.length)return null;
+        TreeNode root=null;
+        if(preorder[index]>min && preorder[index]<max){
+            root=new TreeNode(preorder[index]);
+            index++;
+            root.left=bstFromPreorder(preorder,root.val,min);
+            root.right=bstFromPreorder(preorder,max,root.val);
+        }
+        return root;
+    }
+    //https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree
+    public TreeNode lowestCommonAncestor1(TreeNode root, TreeNode p, TreeNode q) {
+        if(root==null)return null;
+        if(root.val>p.val && root.val>q.val)return lowestCommonAncestor1(root.left,p,q);
+        if(root.val<p.val && root.val<q.val)return lowestCommonAncestor1(root.right,p,q);
+        return root;
+    }
+    //https://leetcode.com/problems/validate-binary-search-tree
+    public boolean isValidBST(TreeNode root) {
+        if(root==null || (root.left==null && root.right==null))return true;
+        return isValidBST(root,Integer.MIN_VALUE-1l,Integer.MAX_VALUE+1l);
+    }
+    public boolean isValidBST(TreeNode root,long min,long max){
+        if(root==null) return true;
+        if(root.val<=min || root.val>=max)return false;
+        return isValidBST(root.left,min,root.val) && isValidBST(root.right,root.val,max);
+    }
+    public boolean isValidBST1(TreeNode root) {
+        Stack<TreeNode> sk=new Stack<>();
+        sk.push(root);
+        TreeNode current=root.left,previous=null;
+        while(current!=null){
+            sk.push(current);
+            current=current.left;
+        }
+        while(!sk.isEmpty()){
+            current=sk.pop();
+            previous=current;
+            current=current.right;
+            while(current!=null){
+                sk.push(current);
+                current=current.left;
+            }
+            if(sk.size()>0 && previous.val>=sk.peek().val)return false;
+        }
+        return true;
+    }
+    //https://leetcode.com/problems/delete-node-in-a-bst
+    public TreeNode deleteNode(TreeNode root, int key) {
+        if(root==null)return null;
+        if(root.val==key){
+            if(root.left==null && root.right==null)return null;
+            if(root.left!=null && root.right!=null){
+                TreeNode temp=findLeftLargest(root.left);
+                root.val=temp.val;
+                temp.left=deleteNode(root.left,temp.val);
+                temp.right=root.right;
+                return temp;
+            }
+            if(root.left!=null)return root.left;
+            return root.right;
+        }
+        if(root.val>key)root.left=deleteNode(root.left,key);
+        if(root.val<key)root.right=deleteNode(root.right,key);
+        return root;
+    }
+    public TreeNode findLeftLargest(TreeNode root){
+        if(root==null)return null;
+        while(root.right!=null){
+            root=root.right;
+        }
+        return root;
     }
     //https://leetcode.com/problems/find-duplicate-subtrees
     public List<TreeNode> findDuplicateSubtrees(TreeNode root) {
@@ -69,7 +184,6 @@ public class LeetCode {
         traverseSum(root,sum,new ArrayList<>());
         return count;
     }
-    int count=0;
     public void traverseSum(TreeNode root,int sum , List<Integer> list){
         if(root==null)return ;
         list.add(root.val);

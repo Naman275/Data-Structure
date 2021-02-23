@@ -1,6 +1,7 @@
 package com.practice.GFG;
 
 
+
 import java.util.*;
 
 public class Tree1 {
@@ -16,6 +17,22 @@ public class Tree1 {
             data = item;
             left = right = null;
         }
+    }
+    //https://practice.geeksforgeeks.org/problems/count-bst-nodes-that-lie-in-a-given-range/1
+    int getCount(Node root,int l, int h)
+    {
+        getCountit(root,l,h);
+        return count;
+        //Your code here
+    }
+    int count=0;
+    void getCountit(Node root,int l, int h)
+    {
+        if(root==null)return;
+        if(root.data>=l && root.data<=h)count++;
+        if(root.data>l)getCountit(root.left,l,h);
+        if(root.data<h)getCountit(root.right,l,h);
+        //Your code here
     }
     //https://practice.geeksforgeeks.org/problems/check-if-tree-is-isomorphic/1
     boolean isIsomorphic(Node root1, Node root2)
