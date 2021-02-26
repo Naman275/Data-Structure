@@ -18,6 +18,64 @@ public class Tree1 {
             left = right = null;
         }
     }
+    class Util{
+        int min,max,size;
+        boolean isBst;
+    }
+    // Return the size of the largest sub-tree which is also a BST
+    int largestBst(Node root)
+    {
+        // Write your code here
+        Util result=traverse(root);
+        return result.size;
+    }
+    public Util traverse(Node root){
+        if(root==null)return null;
+        Util u=new Util();
+        Util left=traverse(root.left);
+        Util right=traverse(root.right);
+        if(left==null && right==null){
+            u.isBst=true;u.max=root.data;u.min=root.data;u.size=1;
+            return u;
+        }
+        if(left !=null && right!=null){
+            if(left.isBst && right.isBst && left.max<root.data && root.data < right.min){
+                u.isBst=true;u.max=right.max;u.min=left.min;u.size=left.size+right.size+1;
+            }
+            else{
+                u.isBst=false;
+                u.max=Math.max(root.data,Math.max(left.max,right.max));
+                u.min=Math.min(root.data,Math.min(left.min,right.min));
+                u.size=Math.max(left.size,right.size);
+                //System.out.println("inside df ="+u.max+". size="+u.size);
+            }
+            return u;
+        }
+        if(left==null){
+            if(right.isBst && root.data<right.min){
+                u.isBst=true;u.size=right.size+1;u.max=right.max;u.min=root.data;
+            }
+            else
+            {
+                u.isBst=false;u.size=right.size;u.max=Math.max(root.data,right.max);
+                u.min=Math.min(root.data,right.min);
+            }
+        }
+        if(right==null){
+            if(left.isBst && root.data>left.max){
+                u.isBst=true;u.size=left.size+1;u.max=root.data;u.min=left.min;
+            }
+            else
+            {
+                u.isBst=false;u.size=left.size;u.max=Math.max(root.data,left.max);
+                u.min=Math.min(root.data,left.min);
+            }
+        }
+        //System.out.println("inside="+u.size);
+        return u;
+    }
+
+
     //https://practice.geeksforgeeks.org/problems/count-bst-nodes-that-lie-in-a-given-range/1
     int getCount(Node root,int l, int h)
     {
