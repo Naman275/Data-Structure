@@ -7,10 +7,104 @@ import java.util.*;
 public class LeetCode {
     public static void main(String[] args){
         LeetCode leetCode=new LeetCode();
-        leetCode.checkME();
-        System.out.println(minJumps(new int[]{2 ,3 ,1, 1, 2, 4 ,2 ,0 ,1 ,1}));
+        leetCode.solveNQueens(4);
+        //leetCode.reorganizeString1("dgdg");
+      //  System.out.println(minJumps(new int[]{2 ,3 ,1, 1, 2, 4 ,2 ,0 ,1 ,1}));
         // 10 17 5 3
         //
+    }
+    //https://leetcode.com/problems/n-queens/
+    public List<List<String>> solveNQueens(int n) {
+        List<List<String>> result=new ArrayList<>();
+        boolean check[][]=new boolean[n][n];
+        lol(0,check,n,result);
+        return result;
+    }
+    public void lol(int row,boolean [][]check,int max,List<List<String>> result){
+        if(row==(max-1)){
+            for(int c=0;c<max;c++){
+                if(traverse(row,c,check)){
+                    check[row][c]=true;
+                    List<String> addme=prepareResult(check);
+                    result.add(addme);
+                    check[row][c]=false;
+                }
+            }
+            return;
+        }
+        for(int c=0;c<max;c++){
+            if(traverse(row,c,check)){
+                check[row][c]=true;
+                lol(row+1,check,max,result);
+                check[row][c]=false;
+            }
+        }
+    }
+    public List<String> prepareResult(boolean [][]check){
+        List<String> result=new ArrayList<>();
+        for(int r=0;r<check.length;r++){
+            StringBuilder sb=new StringBuilder();
+            for(int c=0;c<check.length;c++){
+                sb.append(check[r][c]==true?'Q':'.');
+            }
+            result.add(sb.toString());
+            sb.setLength(0);
+        }
+        return result;
+    }
+    public boolean traverse(int row,int column,boolean [][]check){
+        for(int y=0;y<check.length;y++){
+            if(check[row][y]==true)return false;
+        }
+        for(int r=0;r<check.length;r++){
+            if(check[r][column]==true)return false;
+        }
+
+        for(int r=row,c=column;c<check.length && r>=0;r--,c++){
+            if(check[r][c]==true)return false;
+        }
+
+        for(int r=row,c=column;c<check.length && r<check.length;r++,c++){
+            if(check[r][c]==true)return false;
+        }
+
+        for(int r=row,c=column;c>=0 && r>=0;r--,c--){
+            if(check[r][c]==true)return false;
+        }
+
+        for(int r=row,c=column;c>=0 && r<check.length;r++,c--){
+            if(check[r][c]==true)return false;
+        }
+
+        return true;
+    }
+    //https://leetcode.com/problems/reorganize-string/
+    public String reorganizeString(String S) {
+        Map<Character,Integer> count=new HashMap<Character,Integer>();
+        for(char c:S.toCharArray()){
+            count.put(c,count.getOrDefault(c,0)+1);
+        }
+        PriorityQueue<Character> pq=new PriorityQueue<>((a,b)->{return count.get(b)-count.get(a);});
+        pq.addAll(count.keySet());
+        StringBuilder sb=new StringBuilder();
+        char current,next;
+        int time;
+        while (pq.size()>1){
+            current=pq.poll();
+            next=pq.poll();
+            sb.append(current);sb.append(next);
+            time=count.get(current);
+            if(time>1){count.put(current,time-1);pq.add(current);}
+            time=count.get(next);
+            if(time>1){count.put(next,time-1);pq.add(next);}
+        }
+        if(!pq.isEmpty()){
+            current=pq.poll();
+            time=count.get(current);
+            if (time==1){sb.append(current);}
+            else return "";
+        }
+        return sb.toString();
     }
     //https://leetcode.com/problems/distribute-candies/submissions/
     public int distributeCandies(int[] candyType) {
