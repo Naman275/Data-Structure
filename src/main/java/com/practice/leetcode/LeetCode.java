@@ -12,6 +12,16 @@ public class LeetCode {
         // 10 17 5 3
         //
     }
+    //https://leetcode.com/problems/distribute-candies/submissions/
+    public int distributeCandies(int[] candyType) {
+        Set<Integer> unique=new HashSet<>();
+        for(int n:candyType){
+            unique.add(n);
+        }
+        int max=candyType.length/2;
+        if(unique.size()>=max)return max;
+        return unique.size();
+    }
     //https://leetcode.com/problems/kth-smallest-element-in-a-bst
     public int kthSmallest(TreeNode root, int k) {
         count=k;
