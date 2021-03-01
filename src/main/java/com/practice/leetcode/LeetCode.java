@@ -7,11 +7,56 @@ import java.util.*;
 public class LeetCode {
     public static void main(String[] args){
         LeetCode leetCode=new LeetCode();
-        leetCode.solveNQueens(4);
-        //leetCode.reorganizeString1("dgdg");
-      //  System.out.println(minJumps(new int[]{2 ,3 ,1, 1, 2, 4 ,2 ,0 ,1 ,1}));
-        // 10 17 5 3
-        //
+        leetCode.wordBreak("a",Arrays.asList("a"));
+    }
+    //https://leetcode.com/problems/word-break-ii/
+    public List<String> wordBreak(String s, List<String> wordDict) {
+        boolean [][] result=new boolean[s.length()][s.length()];
+        // fill up the first row
+        List<String> addme=new ArrayList<>();
+        for(int c=0;c<result.length;c++){
+            if(wordDict.contains(s.substring(0,c+1)))
+                result[0][c]=true;
+        }
+        for(int row=1;row<s.length();row++){
+            for(int c=row;c<s.length();c++){
+                if(wordDict.contains(s.substring(row,c+1))){
+                    for(int localrow=row-1;localrow>=0;localrow--){
+                        if(result[localrow][row-1]){
+                            result[row][c]=true;break;
+                        }
+                    }
+                }
+            }
+        }
+        createWord(result,addme,new StringBuilder(),s.length()-1,s.length()-1,s);
+        return addme;
+    }
+    public String reverseme(String text){
+        List<String> addme=new ArrayList<>();
+        for(String a:text.split(" ")){
+            addme.add(a);
+        }
+        StringBuilder sb=new StringBuilder();
+        for(int y=addme.size()-1;y>=0;y--){
+            sb.append(addme.get(y)+" ");
+        }
+        sb.setLength(sb.length()-1);
+        return sb.toString();
+    }
+    public void createWord(boolean[][] result,List<String> addme, StringBuilder useme,int row,int column,String text){
+        if(row<0 && column<0){
+         addme.add(reverseme(useme.toString()));
+         return;
+        }
+        int length=useme.length();
+        for(int y=row;y>=0;y--){
+            useme.setLength(length);
+            if(result[y][column]){
+                useme.append(text.substring(y,column+1)+" ");
+                createWord(result,addme,useme,y-1,y-1,text);
+            }
+        }
     }
     //https://leetcode.com/problems/n-queens/
     public List<List<String>> solveNQueens(int n) {
