@@ -7,7 +7,142 @@ import java.util.*;
 public class LeetCode {
     public static void main(String[] args){
         LeetCode leetCode=new LeetCode();
-        leetCode.wordBreak("a",Arrays.asList("a"));
+
+    }
+   // https://leetcode.com/problems/partition-equal-subset-sum
+   public boolean canPartition(int[] nums) {
+       if(nums.length==0)return false;
+       int totalSum=0;
+       for(int n:nums)totalSum+=n;
+       if((totalSum & 1)==1)return false;
+       boolean sumarray[][]=new boolean[nums.length+1][(totalSum/2)+1];
+       for(int row=0;row<nums.length;row++)sumarray[row][0]=true;
+       for(int row=1;row<sumarray.length;row++){
+           for(int c=1;c<sumarray[row].length;c++){
+               if((c>=nums[row-1] && sumarray[row-1][c-nums[row-1]]) || sumarray[row-1][c]){
+                   if(c==(sumarray[row].length-1))return true;
+                   sumarray[row][c]=true;
+               }
+           }
+       }
+       return false;
+   }
+    //https://leetcode.com/problems/sudoku-solver/
+    public void solveSudoku(char[][] board) {
+        found=false;
+        solveit(board,0,0);
+    }
+    boolean found=false;
+    public void solveit(char[][] board,int row,int column){
+        if(found==true)return;
+        if(column>=9){column=0;row++;}
+        if(row>=9)return;
+        if(row==8 && column ==8){
+            if(board[row][column]=='.') {
+                for (char y = '1'; y <= '9'; y++) {
+                    if (check(board, row, column, y)) {
+                        board[row][column] = y;
+                        found = true;
+                        System.out.println("found");
+                        return;
+                    }
+                }
+            }
+            else{found = true;}
+            return;
+        }
+        if(board[row][column]!='.'){solveit(board, row, column + 1);}
+        else{
+            for (char y = '1'; y <= '9'; y++) {
+                if (check(board, row, column, y)) {
+                    board[row][column] = y;
+                    solveit(board, row, column + 1);
+                    if(found==false)board[row][column] = '.';
+                }
+            }
+        }
+    }
+    public boolean check(char[][]board,int row,int column,char ch){
+        for(int c=0;c<board.length;c++)if(board[row][c]==ch)return false;
+        for(int r=0;r<board.length;r++)if(board[r][column]==ch)return false;
+        int sr=row-(row%3),sc=column-(column%3);
+        //System.out.println(""+sr+":"+sc);
+        for(int r=sr;r<sr+3;r++){
+            for(int c=sc;c<sc+3;c++){
+                if(board[r][c]==ch)return false;
+            }
+        }
+        return true;
+    }
+    //https://leetcode.com/problems/remove-invalid-parentheses
+    public List<String> removeInvalidParentheses(String s){
+        int maxAllowed=tobeRemoved(s);
+        Set<String> addme=new HashSet<>();
+        if(maxAllowed==0){addme.add(s);return new ArrayList<>(addme);}
+        removeInvalidParentheses(s,maxAllowed,addme,new HashSet<>());
+        return new ArrayList<>(addme);
+    }
+    public void removeInvalidParentheses(String s,int max,Set<String> addme,Set<String> processed) {
+        if(max>s.length() || processed.contains(s+"%"+max))return;
+        if(max==0){
+            if(0==tobeRemoved(s))addme.add(s);
+            return;
+        }
+        for(int y=0;y<s.length();y++){
+            while(y<s.length()-1 && s.charAt(y)==s.charAt(y+1))y++;
+            removeInvalidParentheses(s.substring(0,y)+s.substring(y+1),max-1,addme,processed);
+            processed.add(s+"%"+max);
+        }
+    }
+    public Integer tobeRemoved(String s){//O(n)
+        int opening=0,closing=0;
+        int pointer=0;
+        char ch;
+        while(pointer<s.length()){
+            ch=s.charAt(pointer);
+            if(ch=='(')opening++;
+            if(ch==')'){
+                if(opening>0)opening--;
+                else closing++;
+            }
+            pointer++;
+        }
+        return opening+closing;
+    }
+    //https://leetcode.com/problems/valid-parentheses
+    public boolean isValid(String s) {
+        Stack<Character> sk=new Stack<>();
+        int pointer=0;
+        char ch;
+        while(pointer<s.length()){
+            ch=s.charAt(pointer);
+            switch(ch){
+                case '(':{sk.push(ch);break;}
+                case '[':{sk.push(ch);break;}
+                case '{':{sk.push(ch);break;}
+                case ')':{
+                    while(!sk.isEmpty() && sk.peek()!='(')
+                        return false;
+                    if(sk.isEmpty())return false;
+                    sk.pop();
+                    break;
+                }
+                case ']':{
+                    while(!sk.isEmpty() && sk.peek()!='[')
+                        return false;
+                    if(sk.isEmpty())return false;
+                    sk.pop();break;
+                }
+                case '}':{
+                    while(!sk.isEmpty() && sk.peek()!='{')
+                        return false;
+                    if(sk.isEmpty())return false;
+                    sk.pop();break;
+                }
+            }
+            pointer++;
+        }
+        return sk.size()==0?true:false;
     }
     //https://leetcode.com/problems/word-break-ii/
     public List<String> wordBreak(String s, List<String> wordDict) {
