@@ -1,13 +1,163 @@
 package com.practice.leetcode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.util.*;
 
 public class LeetCode {
     public static void main(String[] args){
         LeetCode leetCode=new LeetCode();
+        leetCode.getPermutation(3,2);
+    }
+    //https://leetcode.com/problems/rotting-oranges/
+    public int orangesRotting(int[][] grid) {
+        if(grid.length<=1 && grid[0].length<=1 && (grid[0][0]==0 || grid[0][0]==2))return 0;
+        if(grid.length<=1 && grid[0].length<=1 && grid[0][0]==2)return -1;
+        Queue<int[]> q = new LinkedList<>();
+        for (int row = 0; row < grid.length; row++) {
+            for (int col = 0; col < grid[row].length; col++) {
+                if (grid[row][col] == 2) {
+                    q.add(new int[]{row, col});
+                    grid[row][col]=3;
+                }
+            }
+        }
+        int steps=-1;
+        while (!q.isEmpty()){
+            steps++;
+            int size=q.size();
+            while (size-->0){
+                int temp[]=q.poll();
+                int r=temp[0],c=temp[1];
+                if(check(grid,r+1,c)){
+                    q.add(new int[]{r+1,c});
+                    grid[r+1][c]=3;
+                }
+                if(check(grid,r-1,c)){
+                    q.add(new int[]{r-1,c});
+                    grid[r-1][c]=3;
+                }
+                if(check(grid,r,c+1)){
+                    q.add(new int[]{r,c+1});
+                    grid[r][c+1]=3;
+                }
+                if(check(grid,r,c-1)){
+                    q.add(new int[]{r,c-1});
+                    grid[r][c-1]=3;
+                }
+            }
+        }
+        steps=steps==-1?0:steps;
+        return verify(grid)==false?-1:steps;
+    }
+    public boolean verify(int [][]grid){
+        for(int row=0;row<grid.length;row++){
+            for(int column=0;column<grid[0].length;column++){
+                if(grid[row][column]==1)return false;
+            }
+        }
+        return true;
+    }
+    public boolean check(int [][]grid,int row,int col){
+        if(row<0 || col <0 || row>=grid.length || col >=grid[0].length || grid[row][col]==0 || grid[row][col]==3)return false;
+        return true;
+    }
+    // https://leetcode.com/problems/gas-station
+     public int canCompleteCircuit(int[] gas, int[] cost) {
+         for(int y=0;y<gas.length;y++){
+             gas[y]=gas[y]-cost[y];
+         }
+         int sum=0,length=0;
+         int allow=2;
+         while(allow-->0){
+             for(int y=0;y<gas.length;y++){
+                 if(sum+gas[y]>=0){
+                     length++;
+                     sum=sum+gas[y];
+                 }
+                 else{
+                     length=0;
+                     sum=0;
+                 }
+                 if(length>=gas.length){
+                     return (y+1)%gas.length;
+                 }
+             }
+         }
+         return -1;
+     }
+    // https://leetcode.com/problems/permutation-sequence
+    public String getPermutation(int n, int k)
+    {
+        List<Integer> allowed=new ArrayList<>();
+        for(int y=1;y<=n;y++)allowed.add(y);
+        return  getPermutation(n,k,n,allowed);
+    }
+    public String getPermutation(int n, int k,int total,List<Integer> digits) {
+        StringBuilder sb=new StringBuilder();
+        if(k==1){
+           for(int y:digits)sb.append(y);
+        }
+        else{
+            int fact=calcFact(n);
+            int blockSize=fact/n;
+            int msd=countblock(k,blockSize);
+            sb.append(digits.get(msd-1));
+            digits.remove(msd-1);
+            sb.append(getPermutation(n-1,k-((msd-1)*blockSize),total,digits));
+        }
+        return sb.toString();
+    }
+    public int countblock(int k,int blocksize){
+        int count=1,limit=blocksize;
+        while (k>limit){count++;limit+=blocksize;}
+        return count;
+    }
+    public int calcFact(int n) {
+        int result=1,counter=1;
+        while(counter<=n){
+            result=result*counter;
+            counter++;
+        }
+        return result;
+    }
 
+
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        Set<Integer> list=removeDuplicates(candidates);
+        Set<List<Integer>> addme=new HashSet<>();
+        List<Integer> temp=new ArrayList<>();
+        calculate(list,target,temp,addme);
+        List<List<Integer>> result=new ArrayList<>();
+        for(List<Integer> as:addme){
+            result.add(as);
+        }
+        return result;
+    }
+    public Set<Integer> removeDuplicates(int[] candidates){
+        Set<Integer> list=new HashSet<>();
+        for(int m:candidates)list.add(m);
+        return list;
+    }
+    public void calculate(Set<Integer> candidates,int target,List<Integer> temp,Set<List<Integer>> addme){
+        if(target<0)return;
+        if(target==0){
+            System.out.println("target:"+target);
+            System.out.println("temp:"+temp);
+            Collections.sort(temp);
+            List<Integer> sol=new ArrayList<>(temp);
+            addme.add(sol);
+            return;
+        }
+        for(int y:candidates){
+            if(y<=target){
+                temp.add(y);
+                calculate(candidates,target-y,temp,addme);
+                temp.remove(temp.size()-1);
+
+            }
+        }
     }
    // https://leetcode.com/problems/partition-equal-subset-sum
    public boolean canPartition(int[] nums) {
