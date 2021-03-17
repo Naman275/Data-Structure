@@ -6,10 +6,120 @@ import java.io.IOException;
 import java.util.*;
 
 public class LeetCode {
+
     public static void main(String[] args){
         LeetCode leetCode=new LeetCode();
-        leetCode.getPermutation(3,2);
+        leetCode.maxSlidingWindow(new int[]{1,3,1,2,0,5},3);
+
     }
+
+    // https://practice.geeksforgeeks.org/problems/optimal-strategy-for-a-game-1587115620/1
+    static long countMaximum(int[] arr, int n){
+        // Your code here
+        return findResult(arr,0,arr.length-1,true);
+    }
+
+    static long findResult(int[] arr, int startIndex, int endIndex, boolean pick){
+        if(endIndex<startIndex)return 0;
+        if(pick==true && endIndex==startIndex)return arr[startIndex];
+        if(pick==false && endIndex==startIndex)return 0;
+        String key=startIndex+":"+endIndex;
+        if(result.containsKey(key))result.get(key);
+        long nextValue=0;
+        if(pick) {
+            nextValue = Math.max(arr[startIndex] + findResult(arr, startIndex + 1, endIndex,!pick)
+                    , arr[endIndex] + findResult(arr, startIndex, endIndex - 1,!pick));
+        }
+        else {
+            if(arr[startIndex]>arr[endIndex])
+            nextValue = findResult(arr, startIndex + 1, endIndex,!pick);
+            else
+                nextValue=findResult(arr, startIndex, endIndex - 1,!pick);
+        }
+        result.put(key,nextValue);
+        return nextValue;
+    }
+
+    // https://leetcode.com/problems/sliding-window-maximum/
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        Deque<Integer> q=new LinkedList<>();
+        int result[]=new int[nums.length-k+1];
+        for(int y=0;y<k;y++){
+            addInQueue(q,nums[y]);
+        }
+        result[0]=q.peek();
+        int upperIndex=k,lowerIndex=0;
+        while(upperIndex<nums.length){
+            if(!q.isEmpty() && nums[lowerIndex]==q.peek())q.poll();
+            lowerIndex++;
+            addInQueue(q,nums[upperIndex]);
+            result[lowerIndex]=q.peek();
+            upperIndex++;
+        }
+        return result;
+    }
+
+    public void addInQueue(Deque<Integer> q,int number){
+        while(!q.isEmpty() && q.peekLast()<number)q.removeLast();
+        q.addLast(number);
+    }
+
+    //https://leetcode.com/problems/01-matrix
+    public int[][] updateMatrix(int[][] matrix) {
+        boolean [][]visit=new boolean[matrix.length][matrix[0].length];
+        Queue<int[]> q=new LinkedList<>();
+        for(int row=0;row<matrix.length;row++){
+            for(int col=0;col<matrix[0].length;col++){
+                if(matrix[row][col]==0){
+                    q.add(new int[]{row,col});
+                    visit[row][col]=true;
+                }
+            }
+        }
+        int value=0;
+        while(!q.isEmpty()){
+            value++;
+            int size=q.size();
+            while(size-->0){
+                int[] temp =q.poll();
+                int row=temp[0],col=temp[1];
+                if(verify(visit,row+1,col)){
+                    matrix[row+1][col]=value;
+                    visit[row+1][col]=true;
+                    q.add(new int[]{row+1,col});
+                }
+                if(verify(visit,row-1,col)){
+                    matrix[row-1][col]=value;
+                    visit[row-1][col]=true;
+                    q.add(new int[]{row-1,col});
+                }
+                if(verify(visit,row,col+1)){
+                    matrix[row][col+1]=value;
+                    visit[row][col+1]=true;
+                    q.add(new int[]{row,col+1});
+                }
+                if(verify(visit,row,col-1)){
+                    visit[row][col-1]=true;
+                    matrix[row][col-1]=value;
+                    q.add(new int[]{row,col-1});
+                }
+            }
+        }
+        return matrix;
+    }
+
+    public boolean verify(boolean[][] visit, int row, int col){
+        return row >= 0 && col >= 0 && row < visit.length && col < visit[0].length && !visit[row][col];
+    }
+    public boolean verify(int [][]grid){
+        for(int row=0;row<grid.length;row++){
+            for(int column=0;column<grid[0].length;column++){
+                if(grid[row][column]==1)return false;
+            }
+        }
+        return true;
+    }
+
     //https://leetcode.com/problems/rotting-oranges/
     public int orangesRotting(int[][] grid) {
         if(grid.length<=1 && grid[0].length<=1 && (grid[0][0]==0 || grid[0][0]==2))return 0;
@@ -28,7 +138,7 @@ public class LeetCode {
             steps++;
             int size=q.size();
             while (size-->0){
-                int temp[]=q.poll();
+                int[] temp =q.poll();
                 int r=temp[0],c=temp[1];
                 if(check(grid,r+1,c)){
                     q.add(new int[]{r+1,c});
@@ -50,18 +160,6 @@ public class LeetCode {
         }
         steps=steps==-1?0:steps;
         return verify(grid)==false?-1:steps;
-    }
-    public boolean verify(int [][]grid){
-        for(int row=0;row<grid.length;row++){
-            for(int column=0;column<grid[0].length;column++){
-                if(grid[row][column]==1)return false;
-            }
-        }
-        return true;
-    }
-    public boolean check(int [][]grid,int row,int col){
-        if(row<0 || col <0 || row>=grid.length || col >=grid[0].length || grid[row][col]==0 || grid[row][col]==3)return false;
-        return true;
     }
     // https://leetcode.com/problems/gas-station
      public int canCompleteCircuit(int[] gas, int[] cost) {
@@ -159,24 +257,10 @@ public class LeetCode {
             }
         }
     }
-   // https://leetcode.com/problems/partition-equal-subset-sum
-   public boolean canPartition(int[] nums) {
-       if(nums.length==0)return false;
-       int totalSum=0;
-       for(int n:nums)totalSum+=n;
-       if((totalSum & 1)==1)return false;
-       boolean sumarray[][]=new boolean[nums.length+1][(totalSum/2)+1];
-       for(int row=0;row<nums.length;row++)sumarray[row][0]=true;
-       for(int row=1;row<sumarray.length;row++){
-           for(int c=1;c<sumarray[row].length;c++){
-               if((c>=nums[row-1] && sumarray[row-1][c-nums[row-1]]) || sumarray[row-1][c]){
-                   if(c==(sumarray[row].length-1))return true;
-                   sumarray[row][c]=true;
-               }
-           }
-       }
-       return false;
-   }
+
+    public boolean check(int [][]grid,int row,int col){
+        return row >= 0 && col >= 0 && row < grid.length && col < grid[0].length && grid[row][col] != 0 && grid[row][col] != 3;
+    }
     //https://leetcode.com/problems/sudoku-solver/
     public void solveSudoku(char[][] board) {
         found=false;
@@ -259,41 +343,25 @@ public class LeetCode {
         }
         return opening+closing;
     }
-    //https://leetcode.com/problems/valid-parentheses
-    public boolean isValid(String s) {
-        Stack<Character> sk=new Stack<>();
-        int pointer=0;
-        char ch;
-        while(pointer<s.length()){
-            ch=s.charAt(pointer);
-            switch(ch){
-                case '(':{sk.push(ch);break;}
-                case '[':{sk.push(ch);break;}
-                case '{':{sk.push(ch);break;}
-                case ')':{
-                    while(!sk.isEmpty() && sk.peek()!='(')
-                        return false;
-                    if(sk.isEmpty())return false;
-                    sk.pop();
-                    break;
-                }
-                case ']':{
-                    while(!sk.isEmpty() && sk.peek()!='[')
-                        return false;
-                    if(sk.isEmpty())return false;
-                    sk.pop();break;
-                }
-                case '}':{
-                    while(!sk.isEmpty() && sk.peek()!='{')
-                        return false;
-                    if(sk.isEmpty())return false;
-                    sk.pop();break;
-                }
-            }
-            pointer++;
-        }
-        return sk.size()==0?true:false;
-    }
+
+   // https://leetcode.com/problems/partition-equal-subset-sum
+   public boolean canPartition(int[] nums) {
+       if(nums.length==0)return false;
+       int totalSum=0;
+       for(int n:nums)totalSum+=n;
+       if((totalSum & 1)==1)return false;
+       boolean[][] sumarray =new boolean[nums.length+1][(totalSum/2)+1];
+       for(int row=0;row<nums.length;row++)sumarray[row][0]=true;
+       for(int row=1;row<sumarray.length;row++){
+           for(int c=1;c<sumarray[row].length;c++){
+               if((c>=nums[row-1] && sumarray[row-1][c-nums[row-1]]) || sumarray[row-1][c]){
+                   if(c==(sumarray[row].length-1))return true;
+                   sumarray[row][c]=true;
+               }
+           }
+       }
+       return false;
+   }
     //https://leetcode.com/problems/word-break-ii/
     public List<String> wordBreak(String s, List<String> wordDict) {
         boolean [][] result=new boolean[s.length()][s.length()];
@@ -343,12 +411,41 @@ public class LeetCode {
             }
         }
     }
-    //https://leetcode.com/problems/n-queens/
-    public List<List<String>> solveNQueens(int n) {
-        List<List<String>> result=new ArrayList<>();
-        boolean check[][]=new boolean[n][n];
-        lol(0,check,n,result);
-        return result;
+
+    //https://leetcode.com/problems/valid-parentheses
+    public boolean isValid(String s) {
+        Stack<Character> sk=new Stack<>();
+        int pointer=0;
+        char ch;
+        while(pointer<s.length()){
+            ch=s.charAt(pointer);
+            switch(ch){
+                case '(':{sk.push(ch);break;}
+                case '[':{sk.push(ch);break;}
+                case '{':{sk.push(ch);break;}
+                case ')':{
+                    while(!sk.isEmpty() && sk.peek()!='(')
+                        return false;
+                    if(sk.isEmpty())return false;
+                    sk.pop();
+                    break;
+                }
+                case ']':{
+                    while(!sk.isEmpty() && sk.peek()!='[')
+                        return false;
+                    if(sk.isEmpty())return false;
+                    sk.pop();break;
+                }
+                case '}':{
+                    while(!sk.isEmpty() && sk.peek()!='{')
+                        return false;
+                    if(sk.isEmpty())return false;
+                    sk.pop();break;
+                }
+            }
+            pointer++;
+        }
+        return sk.size() == 0;
     }
     public void lol(int row,boolean [][]check,int max,List<List<String>> result){
         if(row==(max-1)){
@@ -818,10 +915,19 @@ public class LeetCode {
             System.out.println("Fhfh");
         }
     }
+
+    //https://leetcode.com/problems/n-queens/
+    public List<List<String>> solveNQueens(int n) {
+        List<List<String>> result=new ArrayList<>();
+        boolean[][] check =new boolean[n][n];
+        lol(0,check,n,result);
+        return result;
+    }
+
     //https://leetcode.com/problems/max-sum-of-rectangle-no-larger-than-k/
     public int maxSumSubmatrix(int[][] matrix, int k) {
         int leftColumn=0,rightColumn=0,sum=0,max=0,result=0;
-        int temp[]=new int[matrix[0].length];
+        int[] temp =new int[matrix[0].length];
         while(leftColumn!=matrix.length){
             rightColumn=leftColumn;
             for(int y=leftColumn;y<=rightColumn;y++){
@@ -843,44 +949,20 @@ public class LeetCode {
         }
         return 0;
     }
-    // https://practice.geeksforgeeks.org/problems/optimal-strategy-for-a-game-1587115620/1
-    static long countMaximum(int arr[], int n){
-        // Your code here
-        return findResult(arr,0,arr.length-1,true);
-    }
     static Map<String,Long> result=new HashMap<>();
 
-    static long findResult(int arr[],int startIndex,int endIndex,boolean pick){
-        if(endIndex<startIndex)return 0;
-        if(pick==true && endIndex==startIndex)return arr[startIndex];
-        if(pick==false && endIndex==startIndex)return 0;
-        String key=startIndex+":"+endIndex;
-        if(result.containsKey(key))result.get(key);
-        long nextValue=0;
-        if(pick) {
-            nextValue = Math.max(arr[startIndex] + findResult(arr, startIndex + 1, endIndex,!pick)
-                    , arr[endIndex] + findResult(arr, startIndex, endIndex - 1,!pick));
-        }
-        else {
-            if(arr[startIndex]>arr[endIndex])
-            nextValue = findResult(arr, startIndex + 1, endIndex,!pick);
-            else
-                nextValue=findResult(arr, startIndex, endIndex - 1,!pick);
-        }
-        result.put(key,nextValue);
-        return nextValue;
-    }
     // https://practice.geeksforgeeks.org/problems/mobile-numeric-keypad5456/1
-    public int calculateSum(int [][]array,int column[],int row){
+    public int calculateSum(int [][]array, int[] column, int row){
         int sum=0;
         for(int c:column){
             sum+=array[row][c];
         }
         return sum;
     }
+
     public long getCount(int N)
     {
-        int array[][]=new int[N+1][10];
+        int[][] array =new int[N+1][10];
         long sum=10;
         Arrays.fill(array[1],1);
         for(int row=2;row<=N;row++){
@@ -924,9 +1006,10 @@ public class LeetCode {
         return sum;
         // Your code goes here
     }
+
     //https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/
     public int maxProfit(int k, int[] prices) {
-        int profitArray[][]=new int[k+1][prices.length];
+        int[][] profitArray =new int[k+1][prices.length];
         int max=0;
         for(int day=1;day<=k;day++){
             for(int price=1;price<=prices.length;price++){
@@ -939,15 +1022,10 @@ public class LeetCode {
         }
         return profitArray[k][prices.length];
     }
-    // https://leetcode.com/problems/interleaving-string/
-    public boolean isInterleave(String s1, String s2, String s3){
-        return checkInterleaving(s1,s2,s3,0,0,0);
-    }
-    Map<String, Boolean> mem=new HashMap<>();
+
     public boolean checkInterleaving(String a,String b,String c,int aPointer,int bPointer,int cPointer){
         if(cPointer==c.length()){
-            if(aPointer==a.length() && bPointer==b.length())return true;
-            return false;
+            return aPointer == a.length() && bPointer == b.length();
         }
         boolean result=false;
         String key=aPointer+"/"+bPointer+"/"+cPointer;
@@ -964,5 +1042,50 @@ public class LeetCode {
         }
         mem.put(key,result);
         return result;
+    }
+    // https://leetcode.com/problems/interleaving-string/
+    public boolean isInterleave(String s1, String s2, String s3){
+        return checkInterleaving(s1,s2,s3,0,0,0);
+    }
+    Map<String, Boolean> mem=new HashMap<>();
+
+    //https://leetcode.com/problems/find-median-from-data-stream
+    class MedianFinder {
+
+        /** initialize your data structure here. */
+        Queue<Integer> maxh=new PriorityQueue<>(Collections.reverseOrder());
+        Queue<Integer> minh=new PriorityQueue<>();
+        public MedianFinder() {
+
+        }
+        public void addNum(int num) {
+            int totalSize=maxh.size()+minh.size()+1;
+            if((totalSize & 1)==0){//even case element should go in minh
+                if(maxh.size()>0 && maxh.peek()>=num){
+                    minh.add(maxh.poll());
+                    maxh.add(num);
+                    return;
+                }
+                minh.add(num);
+            }
+            else { // odd case element should go in maxh
+                if(minh.size()>0 && minh.peek()<num){
+                    maxh.add(minh.poll());
+                    minh.add(num);
+                    return;
+                }
+                maxh.add(num);
+            }
+        }
+
+        public double findMedian() {
+            int totalSize=maxh.size()+minh.size();
+            if((totalSize & 1)==0){
+                int a=minh.isEmpty()?0:minh.peek();
+                int b=maxh.isEmpty()?0:maxh.peek();
+                return (((double)a+b)/2);
+            }
+            return maxh.isEmpty()?0:maxh.peek();
+        }
     }
 }
