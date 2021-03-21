@@ -3,16 +3,163 @@ package com.practice.leetcode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 
 public class LeetCode {
 
-    public static void main(String[] args){
-        LeetCode leetCode=new LeetCode();
-        leetCode.maxSlidingWindow(new int[]{1,3,1,2,0,5},3);
-
+    public static synchronized boolean compareBigDecimalRange(String minRange,String maxRange,BigDecimal value){
+        BigDecimal min=new BigDecimal(minRange);
+        BigDecimal max=new BigDecimal(maxRange);
+        return min==value.min(min) && max==value.max(max);
     }
+    public static void main(String[] args){
 
+        List<Integer> exp=new ArrayList<>();
+       // exp.contains()
+        System.out.println(compareBigDecimalRange("0.0","0.8",new BigDecimal("0.1")));
+//        LeetCode leetCode=new LeetCode();
+//        ArrayList<Integer> path=new ArrayList<>();
+//        leetCode.maxSlidingWindow(new int[]{1,3,1,2,0,5},3);
+//        int ab[]=new int[]{1 ,3 ,8, 7, 4, 2, 7, 7, 9, 3 ,1, 9, 8, 6, 5, 0, 2 ,8, 6, 0, 2, 4};
+//        leetCode.solve(ab,ab.length);
+    }
+    //https://leetcode.com/problems/number-of-operations-to-make-network-connected
+
+    public int makeConnected(int n, int[][] connections) {
+        int []array=new int[n];
+        for(int y=0;y<n;y++)array[y]=y;
+        int extraWire=0;
+        for(int a[]:connections){
+            if(findparent(a[0],array)==findparent(a[1],array)){extraWire++;continue;}
+            union(a[0],a[1],array);
+        }
+        int fault=0;
+        for(int y=0;y<array.length;y++){
+            if(y==array[y])fault++;
+        }
+        fault--;
+        return extraWire>=(fault)?(fault):-1;
+    }
+    public void union(int a,int b,int []array){
+        int parentA=findparent(a,array);
+        array[findparent(b,array)]=a;
+        return;
+    }
+    public int findparent(int no,int []array){
+        if(no==array[no])return no;
+        int parent=findparent(array[no],array);
+        array[no]=parent;
+        return array[no];
+    }
+    //https://leetcode.com/problems/clone-graph
+    class sultion {
+        Map<Integer, Node> oldToNew = new HashMap<>();
+
+        public Node cloneGraph(Node node) {
+            if (node == null) return null;
+            Set<Integer> visited = new HashSet<>();
+            traverse(node, node, visited);
+            return oldToNew.getOrDefault(node.val, null);
+        }
+
+        public void traverse(Node node, Node parent, Set<Integer> visited) {
+            if (node == null || visited.contains(node.val)) return;
+            copyChilden(node);
+            visited.add(node.val);
+            for (Node child : node.neighbors) {
+                if (child == parent) continue;
+                traverse(child, node, visited);
+            }
+        }
+
+        public void copyChilden(Node old) {
+            Node result = oldToNew.getOrDefault(old.val, new Node());
+            result.val = old.val;
+            oldToNew.put(result.val, result);
+            List<Node> neighbors = result.neighbors;
+            for (Node child : old.neighbors) {
+                Node addme = oldToNew.getOrDefault(child.val, new Node());
+                addme.val = child.val;
+                oldToNew.put(addme.val, addme);
+                neighbors.add(addme);
+            }
+        }
+
+        // https://practice.geeksforgeeks.org/problems/minimum-sum4058/1#
+        String solve(int[] arr, int n) {
+            // code here
+            Arrays.sort(arr);
+            StringBuilder a = new StringBuilder();
+            StringBuilder b = new StringBuilder();
+            int counter = 0;
+            while (counter < arr.length) {
+                a.append(arr[counter]);
+                counter++;
+                if (counter < arr.length) {
+                    b.append(arr[counter]);
+                }
+                counter++;
+            }
+            return addLong(a.toString(), b.toString());
+        }
+
+        public String addLong(String a, String b) {
+            StringBuilder sb = new StringBuilder();
+            int carry = 0;
+            int maxA = a.length() - 1, maxB = b.length() - 1;
+            int tempA = 0, tempB = 0;
+            while (maxA >= 0 && maxB >= 0) {
+                tempA = Integer.parseInt("" + a.charAt(maxA));
+                tempB = Integer.parseInt("" + b.charAt(maxB));
+                sb.append((tempA + tempB + carry) % 10);
+                carry = (tempA + tempB + carry) / 10;
+                maxA--;
+                maxB--;
+            }
+            while (carry > 0 && maxA >= 0) {
+                tempA = Integer.parseInt("" + a.charAt(maxA));
+                sb.append((tempA + carry) % 10);
+                carry = (tempA + carry) / 10;
+                maxA--;
+            }
+            while (carry > 0 && maxB >= 0) {
+                tempB = Integer.parseInt("" + a.charAt(maxB));
+                sb.append((tempB + carry) % 10);
+                carry = (tempB + carry) / 10;
+                maxB--;
+            }
+            if (maxA >= 0) {
+                sb.append(a.substring(0, maxA + 1));
+            }
+            if (maxB >= 0) sb.append(a.substring(0, maxB + 1));
+            if (carry > 0) sb.append(carry);
+            String result = sb.reverse().toString();
+            int counter = 0;
+            while (result.charAt(counter) == '0') counter++;
+            return result.substring(counter);
+        }
+
+        class Node {
+            public int val;
+            public List<Node> neighbors;
+
+            public Node() {
+                val = 0;
+                neighbors = new ArrayList<Node>();
+            }
+
+            public Node(int _val) {
+                val = _val;
+                neighbors = new ArrayList<Node>();
+            }
+
+            public Node(int _val, ArrayList<Node> _neighbors) {
+                val = _val;
+                neighbors = _neighbors;
+            }
+        }
+    }
     // https://practice.geeksforgeeks.org/problems/optimal-strategy-for-a-game-1587115620/1
     static long countMaximum(int[] arr, int n){
         // Your code here
