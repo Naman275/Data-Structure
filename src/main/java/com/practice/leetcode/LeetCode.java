@@ -8,22 +8,54 @@ import java.util.*;
 
 public class LeetCode {
 
+    boolean allow=true;
+
     public static synchronized boolean compareBigDecimalRange(String minRange,String maxRange,BigDecimal value){
         BigDecimal min=new BigDecimal(minRange);
         BigDecimal max=new BigDecimal(maxRange);
         return min==value.min(min) && max==value.max(max);
     }
+
     public static void main(String[] args){
 
-        List<Integer> exp=new ArrayList<>();
-       // exp.contains()
-        System.out.println(compareBigDecimalRange("0.0","0.8",new BigDecimal("0.1")));
-//        LeetCode leetCode=new LeetCode();
-//        ArrayList<Integer> path=new ArrayList<>();
-//        leetCode.maxSlidingWindow(new int[]{1,3,1,2,0,5},3);
-//        int ab[]=new int[]{1 ,3 ,8, 7, 4, 2, 7, 7, 9, 3 ,1, 9, 8, 6, 5, 0, 2 ,8, 6, 0, 2, 4};
-//        leetCode.solve(ab,ab.length);
     }
+
+    //https://leetcode.com/problems/course-schedule
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        Map<Integer,List<Integer>> adjList=new HashMap<>();
+        for(int y[]:prerequisites){
+            List<Integer> addme=adjList.getOrDefault(y[1],new ArrayList<>());
+            addme.add(y[0]);
+            adjList.put(y[1],addme);
+        }
+        Set<Integer> visited=new HashSet<>();
+        for(int y=0;y<numCourses;y++){
+            System.out.println("y="+y);
+            traverse(adjList,visited,y,new HashSet<>());
+            if(allow==false)return allow;
+        }
+        return allow;
+    }
+
+    public void traverse(Map<Integer,List<Integer>> adjList,Set<Integer> visited,int v,Set<Integer> temp){
+        if(temp.contains(v)){
+            allow=false;return;
+        }
+        if(visited.contains(v)){
+            return;
+        }
+        if(adjList.get(v)==null)return;
+        if(allow){
+            temp.add(v);
+            visited.add(v);
+            for(Integer child:adjList.get(v)){
+                System.out.println("child="+child);
+                if(allow)traverse(adjList,visited,child,temp);
+            }
+            temp.remove(v);
+        }
+    }
+
     //https://leetcode.com/problems/number-of-operations-to-make-network-connected
 
     public int makeConnected(int n, int[][] connections) {
@@ -708,8 +740,7 @@ public class LeetCode {
         traverse(root.right);
     }
     int count=0,no=0;
-    boolean allow=true;
-    // https://leetcode.com/problems/balance-a-binary-search-tree
+     // https://leetcode.com/problems/balance-a-binary-search-tree
     public TreeNode balanceBST(TreeNode root) {
         List<TreeNode> list=new ArrayList<>();
         traverse(root,list);
