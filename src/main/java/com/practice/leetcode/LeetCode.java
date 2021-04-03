@@ -16,10 +16,131 @@ public class LeetCode {
         return min==value.min(min) && max==value.max(max);
     }
 
-    public static void main(String[] args){
+    int longestPath=0;
 
+    public static void main(String[] args){
+        Set<Integer> nonunique=new HashSet<>();
+        Set<Integer> removeMe=new HashSet<>();
+        nonunique.removeAll(removeMe);
+        System.out.println(nonunique);
+        nonunique.add(1);
+        nonunique.removeAll(removeMe);
+        System.out.println(nonunique);
+        removeMe.add(1);removeMe.add(2);
+        nonunique.removeAll(removeMe);
+        System.out.println(nonunique);
+
+     }
+
+     //https://leetcode.com/problems/longest-increasing-path-in-a-matrix
+    public int longestIncreasingPath(int[][] matrix) {
+        longestPath=1;
+        Map<String,Integer> mapit=new HashMap<>();
+        for(int r=0;r<matrix.length;r++){
+            for(int c=0;c<matrix[r].length;c++){
+                traverse(matrix,r,c,mapit,1,Integer.MIN_VALUE);
+            }
+        }
+        return longestPath;
     }
 
+    public int traverse(int [][]matrix,int r,int c,Map<String,Integer> mapit,int path,int previous){
+
+        if(r>=matrix.length || c>=matrix[0].length || r<0 || c<0){
+            return 0;
+        }
+
+        String key=":c:"+c+":r:"+r;
+
+        if(matrix[r][c]<=previous)return 0;
+
+        if(mapit.get(key)!=null){
+            return mapit.get(key);
+        }
+
+        int a=traverse(matrix,r+1,c,mapit,1,matrix[r][c]); // move down
+        int cc=traverse(matrix,r,c+1,mapit,1,matrix[r][c]); // move right
+        int b=traverse(matrix,r-1,c,mapit,1,matrix[r][c]); // move up
+        int d=traverse(matrix,r,c-1,mapit,1,matrix[r][c]); // move left
+
+        a=Math.max(a,Math.max(b,cc));
+        a=Math.max(a,d);
+        a++;
+        mapit.put(key,a);
+        longestPath=Math.max(longestPath,path+a-1);
+        return a;
+    }
+
+    //https://leetcode.com/problems/course-schedule-ii
+    class Solution {
+        boolean loop=false;
+
+        public int[] findOrder(int numCourses, int[][] prerequisites) {
+            Map<Integer,List<Integer>> adjList=prepareList(prerequisites);
+            List<Integer> result=new ArrayList<>();
+            int array[]=new int[numCourses];
+            int finalresult[]=new int[numCourses];
+
+            //empty numcourses
+            if(numCourses<=0)return finalresult;
+
+            //if all nodes are separate
+            if(prerequisites.length==0){
+                for(int y=0;y<numCourses;y++)
+                    finalresult[y]=y;
+                return finalresult;
+            }
+
+
+            for(int keys:adjList.keySet()){
+                if(loop==false)traverse(array,keys,adjList,result);
+                else {
+                    System.out.println("loop found");
+                    finalresult=new int[0];
+                    return finalresult;
+                }
+            }
+
+
+
+            for(int y=0;y<result.size();y++){
+                finalresult[y]=result.get(y);
+            }
+            int counter=result.size();
+            for(int y=0;y<numCourses;y++){
+                if(!result.contains(y))finalresult[counter++]=y;
+            }
+
+            return finalresult;
+        }
+
+        public Map<Integer,List<Integer>> prepareList(int [][]pre){
+            Map<Integer,List<Integer>> adjList=new HashMap<>();
+            for(int a[]:pre){
+                List<Integer> addme=adjList.getOrDefault(a[0],new ArrayList<>());
+                addme.add(a[1]);
+                adjList.put(a[0],addme);
+            }
+            return adjList;
+        }
+        public void traverse(int array[],int v, Map<Integer,List<Integer>> adjList,List<Integer> result){
+            if(array[v]==1){
+                loop=true;return;
+            }
+            if(array[v]==2)return;
+            if(adjList.get(v)==null){result.add(v);array[v]=2;return;}
+            if(loop==false){
+                array[v]=1;// 1 means it is still in stack 2 means its visited
+                for(int child:adjList.get(v)){
+                    if(loop==false){
+                        traverse(array,child,adjList,result);
+                    }
+                }
+                array[v]=2;
+                result.add(v);
+            }
+        }
+    }
     //https://leetcode.com/problems/course-schedule
     public boolean canFinish(int numCourses, int[][] prerequisites) {
         Map<Integer,List<Integer>> adjList=new HashMap<>();

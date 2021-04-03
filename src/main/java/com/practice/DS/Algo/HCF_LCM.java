@@ -1,13 +1,15 @@
 package com.practice.DS.Algo;
-import javax.validation.*;
-import javax.validation.constraints.NotEmpty;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableValidator;
 import javax.validation.groups.Default;
 import java.util.Set;
 class HCF{
     public void check(@NotNull(message = "first name cannot be null") String ab, @NotNull  String cv){
-        System.out.println("hi baby there");
     }
 }
 public class HCF_LCM {
