@@ -7,7 +7,122 @@ public class LeetCode1 {
     int time=0;
 
     public static void main(String []args){
+        PriorityQueue<String> pq=new PriorityQueue<>();
+        pq.add("JFKKULNRTJFK");
+        pq.add("JFKNRTJFKKUL");
+        while (pq.size()>0) System.out.println(pq.poll());
+    }
+    //https://leetcode.com/problems/redundant-connection
+    public int[] findRedundantConnection(int[][] edges) {
+        int parent[]=new int[edges.length+1];
+        for(int y=0;y<parent.length;y++)parent[y]=y;
+        int  result[]=new int[2];
+        for(int a[]:edges){
+            if(findParent(a[0],parent)==findParent(a[1],parent)){
+                result[0]=a[0];
+                result[1]=a[1];
+                continue;
+            }
+            merge(a[0],a[1],parent);
+        }
+        return result;
+    }
+    public int findParent(int a,int array[]){
+        if(a==array[a])return a;
+        int ab=findParent(array[a],array);
+        array[a]=ab;
+        return array[a];
+    }
 
+    public void merge(int a,int b,int array[]){
+        int pa=findParent(a,array);
+        int pb=findParent(b,array);
+        array[pa]=array[pb];
+    }
+    //https://leetcode.com/problems/reconstruct-itinerary/
+    public List<String> findItinerary(List<List<String>> tickets) {
+        Map<String,List<String>> list= prepList(tickets);
+        List<String> result=new ArrayList<>();
+        traverse(list,"JFK",result);
+        return result;
+    }
+    public void traverse(Map<String,List<String>> adjList,String key,List<String> result){
+        if(adjList.get(key)==null){
+            result.add(0,key);
+            return;
+        }
+        List<String> addme=adjList.get(key);
+        if(addme.size()<=0){result.add(0,key);return;}
+        if(addme.size()>0){
+            Collections.sort(addme);
+            Iterator it=addme.iterator();
+            while(it.hasNext()){
+                // System.out.println(adjList.get(key));
+                String value=(String)it.next();
+                it.remove();
+                traverse(adjList,value,result);
+            }
+        }
+        result.add(0,key);
+    }
+    public Map<String,List<String>> prepList(List<List<String>> tickets){
+        Map<String,List<String>> mapit=new HashMap<>();
+        for(List<String> array:tickets){
+            List<String> addme=mapit.getOrDefault(array.get(0),new ArrayList<String>());
+            addme.add(array.get(1));
+            mapit.put(array.get(0),addme);
+        }
+        return mapit;
+    }
+    //https://leetcode.com/problems/minimum-height-trees
+    public List<Integer> findMinHeightTrees(int n, int[][] edges) {
+        if(n==1){
+            List<Integer> result=new ArrayList<>();
+            result.add(0);
+            return result;
+        }
+        Map<Integer,Set<Integer>> adjList=prepareAdjList(edges);
+        return checkList(adjList);
+    }
+
+    public List<Integer> checkList(Map<Integer,Set<Integer>> adjList){
+        List<Integer> leaves=new ArrayList<>();
+        while(adjList.size()>2){
+            leaves.removeAll(leaves);
+            for(int key:adjList.keySet()){
+                if(adjList.get(key).size()<=1)leaves.add(key);
+            }
+            normaliseList(adjList,leaves);
+        }
+        leaves.removeAll(leaves);
+        leaves.addAll(adjList.keySet());
+        return leaves;
+    }
+
+    public void normaliseList(Map<Integer,Set<Integer>> adjList,List<Integer> leaves){
+        for(int key:leaves){
+            Set<Integer> removeme=adjList.get(key);
+            for(int y:removeme){
+                Set<Integer> useme=adjList.get(y);
+                useme.remove(key);
+            }
+            adjList.remove(key);
+        }
+    }
+
+    public Map<Integer,Set<Integer>> prepareAdjList(int[][] edges){
+        Map<Integer,Set<Integer>> adjList=new HashMap<>();
+        for(int a[]:edges){
+
+            Set<Integer> addme=adjList.getOrDefault(a[0],new HashSet<>());
+            addme.add(a[1]);
+            adjList.put(a[0],addme);
+
+            addme=adjList.getOrDefault(a[1],new HashSet<>());
+            addme.add(a[0]);
+            adjList.put(a[1],addme);
+        }
+        return adjList;
     }
 
     //https://leetcode.com/problems/ones-and-zeroes
