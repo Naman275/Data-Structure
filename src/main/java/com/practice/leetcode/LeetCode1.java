@@ -1,16 +1,181 @@
 package com.practice.leetcode;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
+
 
 public class LeetCode1 {
     int minCost=Integer.MAX_VALUE;
     int time=0;
+    public static final String MOBILE_NO_REGEX="[0-9]{10}";
 
     public static void main(String []args){
-        PriorityQueue<String> pq=new PriorityQueue<>();
-        pq.add("JFKKULNRTJFK");
-        pq.add("JFKNRTJFKKUL");
-        while (pq.size()>0) System.out.println(pq.poll());
+
+        Date d=new Date();
+        SimpleDateFormat dateFmt = new
+                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        System.out.println(dateFmt.format(new Date()));
+        if(true)return;
+        String ab="1234";
+        System.out.println(ab.matches(MOBILE_NO_REGEX));
+        ab="0123456789";
+        System.out.println(ab.matches(MOBILE_NO_REGEX));
+        ab="012345678f";
+        System.out.println(ab.matches(MOBILE_NO_REGEX));
+        ab="";
+        System.out.println(ab.matches(MOBILE_NO_REGEX));
+        ab="000000000ijk0000000000@";
+        System.out.println(ab.matches(MOBILE_NO_REGEX));
+
+    }
+    //https://leetcode.com/problems/find-eventual-safe-states
+    public List<Integer> eventualSafeNodes(int[][] graph) {
+        // 0 unvisited 1 means safe 2 means loop
+        int visit[]=new int[graph.length];
+        Arrays.fill(visit,0);
+        for(int y=0;y<visit.length;y++){
+            if(visit[y]==0){
+                traverse(graph,visit,y,new HashSet<>());
+            }
+        }
+        List<Integer> result=new ArrayList<>();
+        for(int y=0;y<visit.length;y++){
+            if(visit[y]==1)result.add(y);
+        }
+        return result;
+    }
+    public boolean traverse(int[][]graph,int []visit,int cv,Set<Integer> visited){
+        if(visit[cv]==2)return true;
+        if(visited.contains(cv)){
+            visit[cv]=2;
+            return true;
+        }
+        if(visit[cv]==1)return false;
+        visit[cv]=1;
+        visited.add(cv);
+        for(int child:graph[cv]){
+            if(traverse(graph,visit,child,visited)){
+                visit[cv]=2;
+                return true;
+            }
+        }
+        visited.remove(cv);
+        return false;
+    }
+
+    //https://leetcode.com/problems/all-paths-from-source-to-target
+    public List<List<Integer>> allPathsSourceTarget(int[][] graph) {
+        List<List<Integer>> result=new ArrayList<>();
+        traverse(graph,new ArrayList<>(),0,result);
+        return result;
+    }
+    public void traverse(int [][]graph,List<Integer> temp,int vertice,List<List<Integer>> result){
+
+        // base case if current vertice is the destination
+        if(vertice==graph.length-1){
+            List<Integer> addme=new ArrayList<>(temp);
+            addme.add(vertice);
+            result.add(addme);
+            return;
+        }
+        temp.add(vertice);
+        for(int y:graph[vertice]){
+            traverse(graph,temp,y,result);
+        }
+        temp.remove(temp.size()-1);
+
+    }
+    //https://leetcode.com/problems/is-graph-bipartite/
+    public boolean isBipartite(int[][] graph) {
+        int color[]=new int[graph.length];
+        int visitedCount=0;
+        Queue<Integer> q=new LinkedList<>();
+        while(visitedCount<color.length){
+            for(int y=0;y<color.length;y++){
+                if(color[y]==0){
+                    q.add(y);
+                    break;
+                }
+            }
+            while(!q.isEmpty()){
+                int parent=q.poll();
+                if(color[parent]==0)color[parent]=1;
+                visitedCount++;
+                for(int y=0;y<graph[parent].length;y++){
+                    int child=graph[parent][y];
+                    if(color[child]==0){
+                        color[child]=color[parent]==1?2:1;
+                        q.add(child);
+                    }
+                    if(color[child]==color[parent])return false;
+                }
+            }
+        }
+        return true;
+    }
+    //https://leetcode.com/problems/network-delay-time
+    public int networkDelayTime(int[][] times, int n, int k) {
+
+        Map<String,Integer> cost=new HashMap<>();
+
+        Map<Integer,Map<Integer,Integer>> children=new HashMap<>();
+
+        prepareList(children,times,k);
+
+        if(children.get(k)==null)return -1;
+
+        int minCost[]=new int[n+1];
+        minCost[0]=0;minCost[k]=0;
+        for(int y=1;y<minCost.length;y++){
+            if(y==k)continue;
+            minCost[y]=Integer.MAX_VALUE;
+        }
+
+        PriorityQueue<int []> pq=new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] ints, int[] t1) {
+                return ints[1]-t1[1];
+            }
+        });
+
+        int currTime=0;
+        int v[]=new int[2];
+        v[0]=k;v[1]=0;
+        pq.add(v);
+        int parent[];
+        while(!pq.isEmpty()){
+            parent=pq.poll();
+            currTime=parent[1];
+            if(children.get(parent[0])==null)continue;
+            Map<Integer,Integer> childTime=children.get(parent[0]);
+            for(int key:childTime.keySet()){
+                if(minCost[key]>currTime+childTime.get(key)){
+                    v=new int[2];
+                    v[0]=key;
+                    v[1]=currTime+childTime.get(key);
+                    pq.add(v);
+                    minCost[key]=currTime+childTime.get(key);
+                }
+            }
+
+        }
+        int max=0;
+        for(int val:minCost){
+            if(val==Integer.MAX_VALUE)return -1;
+            max=Math.max(max,val);
+        }
+        return max;
+    }
+
+    //parent child cost
+
+    public void prepareList(Map<Integer,Map<Integer,Integer>> children,int [][]times,int k){
+        for(int t[]:times){
+            if(t[1]==k)continue;
+            Map<Integer,Integer> addme=children.getOrDefault(t[0],new HashMap<>());
+            addme.put(t[1],t[2]);
+            children.put(t[0],addme);
+        }
     }
     //https://leetcode.com/problems/redundant-connection
     public int[] findRedundantConnection(int[][] edges) {
