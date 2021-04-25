@@ -14,6 +14,54 @@ public class LeetCode1 {
         String ab = "cdsf";
     }
 
+    //https://leetcode.com/problems/possible-bipartition
+    public boolean possibleBipartition(int N, int[][] dislikes) {
+        Map<Integer, List<Integer>> mapit = new HashMap<>();
+        prepareGraph(dislikes, mapit);
+        int[] grp = new int[N + 1];
+        for (int y = 0; y < grp.length; y++) {
+            if (grp[y] == 0) {
+                if (!traverse(mapit, grp, y)) return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean traverse(Map<Integer, List<Integer>> mapit, int[] grp, int cur) {
+        if (mapit.get(cur) == null) return true;
+        int pcolor = grp[cur];
+        if (pcolor == 0) {
+            pcolor = 1;
+            grp[cur] = 1;
+        }
+        for (int child : mapit.get(cur)) {
+            if (pcolor == grp[child]) {
+                return false;
+            }
+            if (grp[child] != 0) continue;
+            if (pcolor == 1) {
+                grp[child] = 2;
+            } else {
+                grp[child] = 1;
+            }
+            if (!traverse(mapit, grp, child)) return false;
+        }
+        return true;
+    }
+
+    public void prepareGraph(int[][] d, Map<Integer, List<Integer>> mapit) {
+        for (int[] f : d) {
+            List<Integer> addme = mapit.getOrDefault(f[0], new ArrayList<>());
+            addme.add(f[1]);
+            mapit.put(f[0], addme);
+
+            addme = mapit.getOrDefault(f[1], new ArrayList<>());
+            addme.add(f[0]);
+            mapit.put(f[1], addme);
+
+        }
+    }
+
     //https://leetcode.com/problems/k-similar-strings/
     public int kSimilarity(String s1, String s2) {
         mapit = new HashMap<>();
